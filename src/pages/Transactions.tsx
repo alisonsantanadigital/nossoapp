@@ -99,10 +99,10 @@ export function Transactions() {
     <div className="space-y-6">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Despesas e Receitas</h1>
-          <p className="text-slate-500 mt-1">Acompanhe todas as movimentações da sua casa.</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Despesas e Receitas</h1>
+          <p className="text-slate-400 mt-1">Acompanhe todas as movimentações da sua casa.</p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)} className="shadow-lg shadow-teal-600/20">Novo Lançamento</Button>
+        <Button onClick={() => setIsModalOpen(true)} className="shadow-lg shadow-sky-500/20">Novo Lançamento</Button>
       </header>
 
       {!loading && transactions.length === 0 ? (
@@ -114,28 +114,28 @@ export function Transactions() {
           onAction={() => setIsModalOpen(true)}
         />
       ) : (
-        <div className="bg-white rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-slate-100 overflow-hidden">
-          <div className="divide-y divide-slate-100">
+        <div className="bg-[#131B2F] rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-slate-800/60 overflow-hidden">
+          <div className="divide-y divide-slate-800/60">
             {transactions.map((tx) => (
-              <div key={tx.id} className="p-4 sm:px-6 flex items-center justify-between hover:bg-slate-50 transition-colors group">
+              <div key={tx.id} className="p-4 sm:px-6 flex items-center justify-between hover:bg-[#1E293B] transition-colors group">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-xl shadow-inner">
+                  <div className="w-12 h-12 rounded-2xl bg-[#1E293B] flex items-center justify-center text-xl shadow-inner border border-slate-800/60">
                     {tx.emoji || (tx.type === 'expense' ? '💸' : '💰')}
                   </div>
                   <div>
-                    <h4 className="font-semibold text-slate-900">{tx.description}</h4>
-                    <p className="text-sm text-slate-500">{tx.date.toLocaleDateString('pt-BR')}</p>
+                    <h4 className="font-semibold text-white">{tx.description}</h4>
+                    <p className="text-sm text-slate-400">{tx.date.toLocaleDateString('pt-BR')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <span className={`font-bold ${tx.type === 'income' ? 'text-teal-600' : 'text-slate-900'}`}>
+                    <span className={`font-bold ${tx.type === 'income' ? 'text-emerald-400' : 'text-white'}`}>
                       {tx.type === 'income' ? '+' : '-'} {formatCurrency(tx.amount)}
                     </span>
                   </div>
                   <button 
                     onClick={() => handleDeleteTransaction(tx.id)}
-                    className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                    className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -148,18 +148,18 @@ export function Transactions() {
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Novo Lançamento">
         <form onSubmit={handleAddTransaction} className="space-y-4">
-          <div className="flex p-1 bg-slate-100 rounded-xl mb-4">
+          <div className="flex p-1 bg-[#0B1121] rounded-xl mb-4 border border-slate-800/60">
             <button
               type="button"
               onClick={() => setType('expense')}
-              className={`flex-1 py-2 text-sm font-medium rounded-lg flex items-center justify-center transition-all ${type === 'expense' ? 'bg-white text-red-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg flex items-center justify-center transition-all ${type === 'expense' ? 'bg-[#1E293B] text-rose-400 shadow-sm' : 'text-slate-400 hover:text-white'}`}
             >
               <ArrowDownRight className="w-4 h-4 mr-1" /> Despesa
             </button>
             <button
               type="button"
               onClick={() => setType('income')}
-              className={`flex-1 py-2 text-sm font-medium rounded-lg flex items-center justify-center transition-all ${type === 'income' ? 'bg-white text-teal-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg flex items-center justify-center transition-all ${type === 'income' ? 'bg-[#1E293B] text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-white'}`}
             >
               <ArrowUpRight className="w-4 h-4 mr-1" /> Receita
             </button>

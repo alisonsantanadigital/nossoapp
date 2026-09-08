@@ -30,7 +30,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const docRef = doc(db, 'users', uid);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        setUserProfile({ id: docSnap.id, ...docSnap.data() } as UserProfile);
+        const profile = { id: docSnap.id, ...docSnap.data() } as UserProfile;
+        if (profile.status === 'inactive') {
+          await auth.signOut();
+          setUserProfile(null);
+          setUser(null);
+        } else {
+          setUserProfile(profile);
+        }
       } else {
         setUserProfile(null);
       }

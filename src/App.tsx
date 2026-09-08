@@ -11,7 +11,9 @@ import { Transactions } from './pages/Transactions';
 import { Goals } from './pages/Goals';
 import { Analytics } from './pages/Analytics';
 import { Wishlist } from './pages/Wishlist';
+import { ImportData } from './pages/ImportData';
 import { Layout } from './components/Layout';
+import { Settings } from './pages/Settings';
 import { Loader2 } from 'lucide-react';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -20,7 +22,7 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
   const location = useLocation();
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-teal-600" /></div>;
+    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-sky-400" /></div>;
   }
 
   if (!user) {
@@ -38,7 +40,7 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
   }
 
   if (loadingOrg && location.pathname !== '/onboarding') {
-    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-teal-600" /></div>;
+    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-sky-400" /></div>;
   }
 
   return <>{children}</>;
@@ -63,7 +65,8 @@ export default function App() {
               <Route path="/goals" element={<Goals />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/wishlist" element={<Wishlist />} />
-              <Route path="/settings" element={<div className="p-4"><h1>Configurações</h1></div>} />
+              <Route path="/import" element={<ImportData />} />
+              <Route path="/settings" element={<Settings />} />
             </Route>
           </Routes>
         </BrowserRouter>

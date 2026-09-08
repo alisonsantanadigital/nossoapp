@@ -18,9 +18,14 @@ service cloud.firestore {
              request.auth.uid in get(/databases/$(database)/documents/organizations/$(orgId)).data.members;
     }
 
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.appRole == 'admin';
+    }
+
     // Users Collection
     match /users/{userId} {
-      allow read, write: if isUser(userId);
+      allow read, write: if isUser(userId) || isAdmin();
     }
 
     // Organizations Collection

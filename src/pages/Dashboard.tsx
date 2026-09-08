@@ -71,10 +71,10 @@ export function Dashboard() {
     <div className="space-y-6">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
             Boa noite, {displayName} 👋
           </h1>
-          <p className="text-slate-500 mt-1">
+          <p className="text-slate-400 mt-1">
             Aqui está o resumo da {organization?.name || 'sua casa'} em <span className="capitalize">{currentMonth}</span>.
           </p>
         </div>
@@ -86,7 +86,7 @@ export function Dashboard() {
             </Button>
           </Link>
           <Link to="/transactions" className="hidden md:flex">
-            <Button className="shadow-lg shadow-teal-600/20">
+            <Button className="shadow-lg shadow-sky-500/20">
               <Plus className="w-4 h-4 mr-2" />
               Nova Despesa
             </Button>
@@ -95,8 +95,8 @@ export function Dashboard() {
       </header>
 
       {/* Safe to Spend Indicator */}
-      <div className="bg-teal-600 rounded-2xl p-6 text-white shadow-lg shadow-teal-600/20 relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+      <div className="bg-sky-500 rounded-2xl p-6 text-white shadow-lg shadow-sky-500/20 relative overflow-hidden">
+        <div className="absolute right-0 top-0 w-64 h-64 bg-[#131B2F]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <p className="text-teal-100 font-medium mb-1">Você pode gastar até</p>
@@ -108,7 +108,7 @@ export function Dashboard() {
               Este valor considera suas contas futuras, receitas previstas e metas para o mês.
             </p>
           </div>
-          <div className="bg-white/20 p-4 rounded-xl backdrop-blur-sm border border-white/10 text-center min-w-[140px]">
+          <div className="bg-[#131B2F]/20 p-4 rounded-xl backdrop-blur-sm border border-white/10 text-center min-w-[140px]">
             <p className="text-teal-50 text-sm mb-1">Disponível no Mês</p>
             <p className="text-xl font-bold">{formatCurrency(metrics.balance)}</p>
           </div>
@@ -120,81 +120,81 @@ export function Dashboard() {
         <Card>
           <CardContent className="p-5">
             <div className="flex justify-between items-start mb-4">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center">
-                <ArrowUpRight className="w-5 h-5 text-teal-600" />
+              <div className="w-10 h-10 rounded-xl bg-sky-400/10 flex items-center justify-center">
+                <ArrowUpRight className="w-5 h-5 text-sky-400" />
               </div>
-              <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">Recebidos</span>
+              <span className="text-xs font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-full">Recebidos</span>
             </div>
-            <p className="text-slate-500 text-sm font-medium mb-1">Entradas</p>
-            <h3 className="text-2xl font-bold text-slate-900 tracking-tight">{formatCurrency(metrics.incomes)}</h3>
+            <p className="text-slate-400 text-sm font-medium mb-1">Entradas</p>
+            <h3 className="text-2xl font-bold text-white tracking-tight">{formatCurrency(metrics.incomes)}</h3>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-5">
             <div className="flex justify-between items-start mb-4">
-              <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
-                <ArrowDownRight className="w-5 h-5 text-red-600" />
+              <div className="w-10 h-10 rounded-xl bg-rose-400/10 flex items-center justify-center">
+                <ArrowDownRight className="w-5 h-5 text-rose-400" />
               </div>
-              <span className="text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded-full">Pagos</span>
+              <span className="text-xs font-medium text-rose-400 bg-rose-400/10 px-2 py-1 rounded-full">Pagos</span>
             </div>
-            <p className="text-slate-500 text-sm font-medium mb-1">Despesas</p>
-            <h3 className="text-2xl font-bold text-slate-900 tracking-tight">{formatCurrency(metrics.expenses)}</h3>
+            <p className="text-slate-400 text-sm font-medium mb-1">Despesas</p>
+            <h3 className="text-2xl font-bold text-white tracking-tight">{formatCurrency(metrics.expenses)}</h3>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-5">
             <div className="flex justify-between items-start mb-4">
-              <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
-                <Receipt className="w-5 h-5 text-amber-600" />
+              <div className="w-10 h-10 rounded-xl bg-amber-400/10 flex items-center justify-center">
+                <Receipt className="w-5 h-5 text-amber-500" />
               </div>
-              <span className="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-full">Previstas</span>
+              <span className="text-xs font-medium text-amber-500 bg-amber-400/10 px-2 py-1 rounded-full">Previstas</span>
             </div>
-            <p className="text-slate-500 text-sm font-medium mb-1">Contas Pendentes</p>
-            <h3 className="text-2xl font-bold text-slate-900 tracking-tight">{formatCurrency(metrics.pendingBills)}</h3>
+            <p className="text-slate-400 text-sm font-medium mb-1">Contas Pendentes</p>
+            <h3 className="text-2xl font-bold text-white tracking-tight">{formatCurrency(metrics.pendingBills)}</h3>
           </CardContent>
         </Card>
 
         <Card>
           <CardContent className="p-5">
             <div className="flex justify-between items-start mb-4">
-              <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
-                <Target className="w-5 h-5 text-indigo-600" />
+              <div className="w-10 h-10 rounded-xl bg-indigo-400/10 flex items-center justify-center">
+                <Target className="w-5 h-5 text-indigo-400" />
               </div>
-              <span className="text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-1 rounded-full">Guardado</span>
+              <span className="text-xs font-medium text-indigo-400 bg-indigo-400/10 px-2 py-1 rounded-full">Guardado</span>
             </div>
-            <p className="text-slate-500 text-sm font-medium mb-1">Economia</p>
-            <h3 className="text-2xl font-bold text-slate-900 tracking-tight">{formatCurrency(metrics.saved)}</h3>
+            <p className="text-slate-400 text-sm font-medium mb-1">Economia</p>
+            <h3 className="text-2xl font-bold text-white tracking-tight">{formatCurrency(metrics.saved)}</h3>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
         <Card className="flex flex-col">
-          <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-            <h3 className="font-semibold text-slate-900">Últimos Lançamentos</h3>
-            <Link to="/transactions" className="text-sm text-teal-600 font-medium hover:text-teal-700">Ver todos</Link>
+          <div className="p-6 border-b border-[#1E293B] flex items-center justify-between">
+            <h3 className="font-semibold text-white">Últimos Lançamentos</h3>
+            <Link to="/transactions" className="text-sm text-sky-400 font-medium hover:text-sky-300">Ver todos</Link>
           </div>
           <CardContent className="p-0 flex-1">
             {transactions.length === 0 ? (
-              <div className="p-6 text-center text-slate-500 text-sm">Nenhum lançamento recente.</div>
+              <div className="p-6 text-center text-slate-400 text-sm">Nenhum lançamento recente.</div>
             ) : (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-slate-800/60">
                 {transactions.slice(0, 3).map((tx, i) => (
-                  <div key={i} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                  <div key={i} className="p-4 flex items-center justify-between hover:bg-[#1E293B] transition-colors">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-lg shadow-inner">
+                      <div className="w-10 h-10 rounded-full bg-[#1E293B] flex items-center justify-center text-lg shadow-inner">
                         {tx.emoji || (tx.type === 'expense' ? '💸' : '💰')}
                       </div>
                       <div>
-                        <p className="font-medium text-slate-900 text-sm">{tx.description}</p>
-                        <p className="text-xs text-slate-500 font-medium">
+                        <p className="font-medium text-white text-sm">{tx.description}</p>
+                        <p className="text-xs text-slate-400 font-medium">
                           {tx.date && typeof tx.date.toDate === 'function' ? tx.date.toDate().toLocaleDateString('pt-BR') : new Date(tx.date).toLocaleDateString('pt-BR')}
                         </p>
                       </div>
                     </div>
-                    <span className={`font-semibold ${tx.type === 'income' ? 'text-teal-600' : 'text-slate-900'}`}>
+                    <span className={`font-semibold ${tx.type === 'income' ? 'text-emerald-400' : 'text-white'}`}>
                       {tx.type === 'income' ? '+' : '-'} {formatCurrency(tx.amount)}
                     </span>
                   </div>
@@ -205,33 +205,33 @@ export function Dashboard() {
         </Card>
 
         <Card className="flex flex-col">
-          <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-            <h3 className="font-semibold text-slate-900">Progresso das Metas</h3>
-            <Link to="/goals" className="text-sm text-teal-600 font-medium hover:text-teal-700">Ver todas</Link>
+          <div className="p-6 border-b border-[#1E293B] flex items-center justify-between">
+            <h3 className="font-semibold text-white">Progresso das Metas</h3>
+            <Link to="/goals" className="text-sm text-sky-400 font-medium hover:text-sky-300">Ver todas</Link>
           </div>
           <CardContent className="p-6 space-y-6 flex-1">
             {goals.length === 0 ? (
-              <div className="text-center text-slate-500 text-sm h-full flex items-center justify-center">Nenhuma meta definida.</div>
+              <div className="text-center text-slate-400 text-sm h-full flex items-center justify-center">Nenhuma meta definida.</div>
             ) : (
               goals.slice(0, 2).map((goal, i) => (
                 <div key={i}>
                   <div className="flex justify-between items-end mb-2">
                     <div className="flex items-center gap-2">
                       <span className="text-lg">{goal.emoji || '🎯'}</span>
-                      <span className="font-medium text-slate-700">{goal.name}</span>
+                      <span className="font-medium text-slate-100">{goal.name}</span>
                     </div>
                     <div className="text-right">
-                      <span className="text-sm font-medium text-slate-900">{formatCurrency(goal.currentAmount)}</span>
-                      <span className="text-xs text-slate-500"> / {formatCurrency(goal.targetAmount)}</span>
+                      <span className="text-sm font-medium text-white">{formatCurrency(goal.currentAmount)}</span>
+                      <span className="text-xs text-slate-400"> / {formatCurrency(goal.targetAmount)}</span>
                     </div>
                   </div>
-                  <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                  <div className="w-full bg-[#1E293B] rounded-full h-2.5 overflow-hidden">
                     <div 
-                      className="bg-indigo-500 h-2.5 rounded-full" 
+                      className="bg-sky-500 h-2.5 rounded-full" 
                       style={{ width: `${Math.min(100, (goal.currentAmount / goal.targetAmount) * 100)}%` }}
                     ></div>
                   </div>
-                  <p className="text-xs text-slate-500 mt-1 text-right">{Math.round((goal.currentAmount / goal.targetAmount) * 100)}% concluído</p>
+                  <p className="text-xs text-slate-400 mt-1 text-right">{Math.round((goal.currentAmount / goal.targetAmount) * 100)}% concluído</p>
                 </div>
               ))
             )}

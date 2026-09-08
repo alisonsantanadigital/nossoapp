@@ -49,13 +49,13 @@ export function Onboarding() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-center items-center p-4">
-      <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 text-center">
-        <div className="w-16 h-16 bg-teal-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-          <Building2 className="w-8 h-8 text-teal-600" />
+    <div className="min-h-screen bg-[#0B1121] flex flex-col justify-center items-center p-4">
+      <div className="w-full max-w-md bg-[#131B2F] p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#1E293B] text-center">
+        <div className="w-16 h-16 bg-sky-400/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <Building2 className="w-8 h-8 text-sky-400" />
         </div>
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">👋 Vamos configurar sua casa</h1>
-        <p className="text-slate-500 mb-8 text-sm">Crie seu ambiente compartilhado para gerenciar as finanças.</p>
+        <h1 className="text-2xl font-bold text-white mb-2">👋 Vamos configurar sua casa</h1>
+        <p className="text-slate-400 mb-8 text-sm">Crie seu ambiente compartilhado para gerenciar as finanças.</p>
 
         <form onSubmit={handleCreateOrg} className="space-y-6 text-left">
           <Input 

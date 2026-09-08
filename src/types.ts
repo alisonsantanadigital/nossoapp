@@ -2,11 +2,14 @@ export type Role = "admin" | "member" | "viewer";
 
 export interface UserProfile {
   id: string;
+  username: string;
   displayName: string;
   email: string;
   photoURL?: string;
   currentOrganizationId?: string;
   preferences?: Record<string, any>;
+  status?: 'active' | 'inactive';
+  appRole?: 'admin' | 'user';
 }
 
 export interface Organization {

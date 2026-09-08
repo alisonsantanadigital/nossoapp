@@ -99,11 +99,11 @@ export function Goals() {
     <div className="space-y-6">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Metas</h1>
-          <p className="text-slate-500 mt-1">Acompanhe seus grandes objetivos financeiros.</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Metas</h1>
+          <p className="text-slate-400 mt-1">Acompanhe seus grandes objetivos financeiros.</p>
         </div>
         {goals.length > 0 && (
-          <Button onClick={() => setIsModalOpen(true)} className="shadow-lg shadow-teal-600/20">
+          <Button onClick={() => setIsModalOpen(true)} className="shadow-lg shadow-sky-500/20">
             Nova Meta
           </Button>
         )}
@@ -123,35 +123,35 @@ export function Goals() {
             <Card key={goal.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer relative group">
               <button 
                 onClick={(e) => handleDeleteGoal(goal.id, e)}
-                className="absolute top-4 right-4 p-2 bg-white/80 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-all z-10"
+                className="absolute top-4 right-4 p-2 bg-[#131B2F]/80 hover:bg-red-50 text-slate-400 hover:text-rose-400 rounded-full opacity-0 group-hover:opacity-100 transition-all z-10"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
-              <div className="h-32 bg-slate-100 flex items-center justify-center text-5xl">
+              <div className="h-32 bg-[#1E293B] flex items-center justify-center text-5xl">
                 {(goal as any).emoji || '🎯'}
               </div>
               <CardContent className="p-6">
-                <h3 className="font-semibold text-lg text-slate-900 mb-2">{goal.name}</h3>
+                <h3 className="font-semibold text-lg text-white mb-2">{goal.name}</h3>
                 
                 <div className="flex justify-between items-end mb-2">
                   <div>
-                    <p className="text-xs text-slate-500 font-medium">Acumulado</p>
-                    <p className="text-lg font-bold text-slate-900">{formatCurrency(goal.currentAmount)}</p>
+                    <p className="text-xs text-slate-400 font-medium">Acumulado</p>
+                    <p className="text-lg font-bold text-white">{formatCurrency(goal.currentAmount)}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-slate-500 font-medium">Objetivo</p>
-                    <p className="text-sm font-medium text-slate-600">{formatCurrency(goal.targetAmount)}</p>
+                    <p className="text-xs text-slate-400 font-medium">Objetivo</p>
+                    <p className="text-sm font-medium text-slate-300">{formatCurrency(goal.targetAmount)}</p>
                   </div>
                 </div>
                 
-                <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden mb-4">
+                <div className="w-full bg-[#131B2F] rounded-full h-2.5 overflow-hidden mb-4 border border-slate-800/60">
                   <div 
-                    className="bg-indigo-500 h-2.5 rounded-full" 
+                    className="bg-sky-500 h-2.5 rounded-full" 
                     style={{ width: `${Math.min(100, (goal.currentAmount / goal.targetAmount) * 100)}%` }}
                   ></div>
                 </div>
                 
-                <p className="text-xs text-slate-500 text-center font-medium bg-slate-50 py-2 rounded-lg">
+                <p className="text-xs text-slate-400 text-center font-medium bg-[#131B2F] border border-slate-800/60 py-2 rounded-lg">
                   Prazo: {goal.deadline.toLocaleDateString('pt-BR')}
                 </p>
               </CardContent>

@@ -7,8 +7,8 @@ export function Analytics() {
     <div className="space-y-6">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Análises</h1>
-          <p className="text-slate-500 mt-1">Entenda para onde está indo o seu dinheiro.</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Análises</h1>
+          <p className="text-slate-400 mt-1">Entenda para onde está indo o seu dinheiro.</p>
         </div>
       </header>
 
