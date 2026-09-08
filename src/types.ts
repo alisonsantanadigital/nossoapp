@@ -53,6 +53,9 @@ export interface Transaction {
   notes?: string;
   tags?: string[];
   emoji?: string;
+  imageUrl?: string;
+  isFixed?: boolean;
+  installmentInfo?: string;
 }
 
 export interface Bill {

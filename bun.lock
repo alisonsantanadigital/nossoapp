@@ -11,6 +11,7 @@
         "clsx": "^2.1.1",
         "date-fns": "^4.4.0",
         "dotenv": "^17.2.3",
+        "emoji-picker-react": "^4.20.2",
         "express": "^5.2.1",
         "firebase": "^12.18.0",
         "lucide-react": "^1.42.0",
@@ -496,6 +497,8 @@
 
     "electron-to-chromium": ["electron-to-chromium@1.5.422", "", {}, "sha512-UvA/32XqrLDdZSn7Jllo1AYNcWji/G0d5M0GTViE7KoGBiMunw3a34Sb2KO4ZZyrSEhqsxFoVhWWJshdyfKqJA=="],
 
+    "emoji-picker-react": ["emoji-picker-react@4.20.2", "", { "dependencies": { "flairup": "1.1.2" }, "peerDependencies": { "react": ">=16.8" } }, "sha512-bE1Y6je2HNUm5TGjoTNYSjlpVxITC+rkvvMMaLPx9lYD283pDj6qtG2H62KOcPVgQUBaHed3dDtOPKZ2zXMXcQ=="],
+
     "emoji-regex": ["emoji-regex@8.0.0", "", {}, "sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A=="],
 
     "encodeurl": ["encodeurl@2.0.0", "", {}, "sha512-Q0n9HRi4m6JuGIV1eFlmvJB7ZEVxu93IrMyiMsGC0lrMJMWzRgx6WGquyfQgZVb31vhGgXnfmPNNXmxnOkRBrg=="],
@@ -533,6 +536,8 @@
     "finalhandler": ["finalhandler@2.1.1", "", { "dependencies": { "debug": "^4.4.0", "encodeurl": "^2.0.0", "escape-html": "^1.0.3", "on-finished": "^2.4.1", "parseurl": "^1.3.3", "statuses": "^2.0.1" } }, "sha512-S8KoZgRZN+a5rNwqTxlZZePjT/4cnm0ROV70LedRHZ0p8u9fRID0hJUZQpkKLzro8LfmC8sx23bY6tVNxv8pQA=="],
 
     "firebase": ["firebase@12.18.0", "", { "dependencies": { "@firebase/ai": "2.15.0", "@firebase/analytics": "0.10.24", "@firebase/analytics-compat": "0.2.30", "@firebase/app": "0.16.1", "@firebase/app-check": "0.13.1", "@firebase/app-check-compat": "0.4.7", "@firebase/app-compat": "0.5.17", "@firebase/app-types": "0.9.6", "@firebase/auth": "1.13.5", "@firebase/auth-compat": "0.6.10", "@firebase/data-connect": "0.7.4", "@firebase/database": "1.1.5", "@firebase/database-compat": "2.1.7", "@firebase/firestore": "4.17.1", "@firebase/firestore-compat": "0.4.13", "@firebase/functions": "0.14.0", "@firebase/functions-compat": "0.5.0", "@firebase/installations": "0.6.24", "@firebase/installations-compat": "0.2.24", "@firebase/messaging": "0.13.2", "@firebase/messaging-compat": "0.2.29", "@firebase/performance": "0.7.14", "@firebase/performance-compat": "0.2.27", "@firebase/remote-config": "0.9.2", "@firebase/remote-config-compat": "0.2.29", "@firebase/storage": "0.14.5", "@firebase/storage-compat": "0.4.5", "@firebase/util": "1.15.3" } }, "sha512-XaL6tlE5Xd20ZDhckqOMIw+JJTET+wTdeZPxQ7ihc42oxRb7kWUyn/j1LO5V9dH1xq8Rv5R71Pv1fBCdIkt9Rw=="],
+
+    "flairup": ["flairup@1.1.2", "", {}, "sha512-AiTgxMXuGu5YpEe+39c61pe+0dhmzGMQkntbJjK9FdUY/UmtqlhIVGtrBR2zznbShArdjKWyYNV3mGBJC7fTWQ=="],
 
     "formdata-polyfill": ["formdata-polyfill@4.0.10", "", { "dependencies": { "fetch-blob": "^3.1.2" } }, "sha512-buewHzMvYL29jdeQTVILecSaZKnt/RJWjoZCF5OW60Z67/GmSLBkOFM7qh1PI3zFNtJbaZL5eQu1vLfazOwj4g=="],
 

@@ -38,13 +38,14 @@ app.post("/api/gemini/extract-transactions", async (req, res) => {
           },
         },
         {
-          text: `You are a financial assistant. Extract all financial transactions from this image. 
-Return ONLY a valid JSON array of objects. Do not include markdown formatting or json code blocks like \`\`\`json.
-Each object must have the following structure:
-- description: string (name of the expense/income)
-- amount: number (positive number)
-- type: string (must be exactly "expense" or "income")
+          text: `You are a financial assistant. Extract the main purchase information from this receipt, invoice, or statement.
+Return ONLY a valid JSON object. Do not include markdown formatting or json code blocks.
+The object must have the following structure:
+- description: string (Name of the establishment or main description of the expense/income)
+- amount: number (Total value of the purchase/receipt as a positive number)
 - date: string (ISO format YYYY-MM-DD. If year is missing, use current year)
+- receiptNumber: string (The invoice, coupon or receipt number, if available. Otherwise use "")
+- type: string (must be exactly "expense" or "income" - default to expense for store receipts)
 
 Make sure to parse amounts correctly, ignoring currency symbols and converting comma to dot if necessary (e.g. 1.250,50 -> 1250.50).`,
         },
@@ -55,18 +56,17 @@ Make sure to parse amounts correctly, ignoring currency symbols and converting c
     });
 
     let rawText = response.text || "";
-    // Clean up potential markdown formatting just in case
     if (rawText.startsWith('```json')) rawText = rawText.replace(/```json/g, '').replace(/```/g, '');
     
-    let transactions = [];
+    let extractedData = null;
     try {
-      transactions = JSON.parse(rawText);
+      extractedData = JSON.parse(rawText);
     } catch (e) {
       console.error("Failed to parse JSON", rawText);
       return res.status(500).json({ error: "Failed to parse AI response into JSON" });
     }
 
-    res.json({ transactions });
+    res.json({ transaction: extractedData });
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     res.status(500).json({ error: error.message || "Internal server error" });

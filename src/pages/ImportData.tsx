@@ -1,16 +1,18 @@
 import React, { useState, useRef } from 'react';
-import { UploadCloud, FileText, CheckCircle2, AlertCircle, RefreshCw, Plus, X } from 'lucide-react';
+import { UploadCloud, FileText, CheckCircle2, AlertCircle, RefreshCw, Plus, Edit2, Camera, Image as ImageIcon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useOrg } from '../contexts/OrgContext';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
 
 interface ExtractedTransaction {
   description: string;
   amount: number;
   type: 'expense' | 'income';
   date: string;
+  receiptNumber?: string;
 }
 
 export function ImportData() {
@@ -21,13 +23,22 @@ export function ImportData() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [extractedData, setExtractedData] = useState<ExtractedTransaction[] | null>(null);
   
-  // Selected account and category to bulk import
+  const [extractedData, setExtractedData] = useState<ExtractedTransaction | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  
+  // Edit Form State
+  const [editDesc, setEditDesc] = useState('');
+  const [editAmount, setEditAmount] = useState('');
+  const [editDate, setEditDate] = useState('');
+  const [editReceiptNumber, setEditReceiptNumber] = useState('');
+  
+  // Selected account and category to import
   const [selectedAccountId, setSelectedAccountId] = useState(accounts[0]?.id || '');
   const [selectedCategoryId, setSelectedCategoryId] = useState(categories[0]?.id || '');
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -45,6 +56,7 @@ export function ImportData() {
         setError('');
         setSuccess('');
         setExtractedData(null);
+        setIsEditing(false);
       }
     };
     reader.readAsDataURL(file);
@@ -57,7 +69,6 @@ export function ImportData() {
     setError('');
     
     try {
-      // Split "data:image/jpeg;base64,....."
       const [header, base64Data] = imagePreview.split(',');
       const mimeTypeMatch = header.match(/:(.*?);/);
       const mimeType = mimeTypeMatch ? mimeTypeMatch[1] : 'image/jpeg';
@@ -77,8 +88,8 @@ export function ImportData() {
         throw new Error(data.error || 'Erro na API de IA');
       }
 
-      setExtractedData(data.transactions);
-      setSuccess('Dados extraídos com sucesso! Revise e importe abaixo.');
+      setExtractedData(data.transaction);
+      setSuccess('Leitura concluída! Revise os dados abaixo.');
     } catch (err: any) {
       setError(err.message || 'Falha ao analisar a imagem.');
       console.error(err);
@@ -87,8 +98,8 @@ export function ImportData() {
     }
   };
 
-  const handleImport = async () => {
-    if (!extractedData || extractedData.length === 0) return;
+  const handleConfirmImport = async () => {
+    if (!extractedData) return;
     if (!userProfile?.currentOrganizationId) {
       setError('Organização não encontrada.');
       return;
@@ -105,48 +116,73 @@ export function ImportData() {
       const orgId = userProfile.currentOrganizationId;
       const txRef = collection(db, 'transactions');
       
-      const promises = extractedData.map(tx => {
-        let dateObj = new Date(tx.date);
-        if (isNaN(dateObj.getTime())) dateObj = new Date(); // fallback
-        
-        return addDoc(txRef, {
-          orgId,
-          amount: tx.amount,
-          type: tx.type,
-          description: tx.description,
-          date: dateObj.toISOString(),
-          accountId: selectedAccountId,
-          categoryId: selectedCategoryId || null, // Optional
-          status: 'completed',
-          createdAt: serverTimestamp(),
-          notes: 'Importado via IA',
-        });
-      });
-
-      await Promise.all(promises);
+      let dateObj = new Date(extractedData.date);
+      if (isNaN(dateObj.getTime())) dateObj = new Date();
       
-      setSuccess(`${extractedData.length} lançamento(s) importados com sucesso!`);
+      await addDoc(txRef, {
+        orgId,
+        amount: extractedData.amount,
+        type: extractedData.type,
+        description: extractedData.description,
+        date: dateObj.toISOString(),
+        accountId: selectedAccountId,
+        categoryId: selectedCategoryId || null,
+        status: 'completed',
+        createdAt: serverTimestamp(),
+        notes: extractedData.receiptNumber ? `Nota: ${extractedData.receiptNumber}` : 'Importado via IA',
+        imageUrl: imagePreview,
+      });
+      
+      setSuccess('Lançamento salvo com sucesso!');
       setExtractedData(null);
       setImagePreview(null);
+      setIsEditing(false);
     } catch (err: any) {
-      setError('Erro ao salvar lançamentos no banco de dados.');
+      setError('Erro ao salvar lançamento no banco de dados.');
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const removeItem = (index: number) => {
-    if (extractedData) {
-      setExtractedData(extractedData.filter((_, i) => i !== index));
-    }
+  const openEdit = () => {
+    if (!extractedData) return;
+    setEditDesc(extractedData.description);
+    setEditAmount(extractedData.amount.toString());
+    setEditDate(extractedData.date);
+    setEditReceiptNumber(extractedData.receiptNumber || '');
+    setIsEditing(true);
+  };
+
+  const saveEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!extractedData) return;
+    
+    setExtractedData({
+      ...extractedData,
+      description: editDesc,
+      amount: Number(editAmount),
+      date: editDate,
+      receiptNumber: editReceiptNumber,
+    });
+    setIsEditing(false);
+  };
+
+  const resetAll = () => {
+    setImagePreview(null);
+    setExtractedData(null);
+    setIsEditing(false);
+    setError('');
+    setSuccess('');
+    if (cameraInputRef.current) cameraInputRef.current.value = '';
+    if (galleryInputRef.current) galleryInputRef.current.value = '';
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white tracking-tight">Leitura de Notas</h1>
-        <p className="text-slate-400 mt-1">Envie o print de um extrato ou cupom e nossa IA fará o trabalho de digitar tudo por você.</p>
+        <h1 className="text-2xl font-bold text-white tracking-tight">Leitura de Comprovante</h1>
+        <p className="text-slate-400 mt-1">Tire uma foto pelo celular ou envie um print e nossa IA extrairá os dados automaticamente.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -154,15 +190,24 @@ export function ImportData() {
         {/* Upload Column */}
         <div className="space-y-4">
           <div 
-            className={`border-2 border-dashed rounded-3xl p-8 flex flex-col items-center justify-center text-center transition-colors cursor-pointer min-h-[300px]
-              ${imagePreview ? 'border-teal-500 bg-sky-400/10/30' : 'border-slate-700 bg-[#131B2F] hover:bg-[#1E293B]'}`}
-            onClick={() => !imagePreview && fileInputRef.current?.click()}
+            className={`border-2 border-dashed rounded-3xl p-8 flex flex-col items-center justify-center text-center transition-colors min-h-[300px]
+              ${imagePreview ? 'border-sky-500 bg-sky-400/10' : 'border-slate-700 bg-[#131B2F]'}`}
           >
+            {/* Input for direct camera capture */}
             <input 
               type="file" 
-              ref={fileInputRef} 
+              ref={cameraInputRef} 
               className="hidden" 
-              accept="image/png, image/jpeg, image/webp" 
+              accept="image/*" 
+              capture="environment"
+              onChange={handleFileSelect}
+            />
+            {/* Input for gallery/file picker */}
+            <input 
+              type="file" 
+              ref={galleryInputRef} 
+              className="hidden" 
+              accept="image/*" 
               onChange={handleFileSelect}
             />
             
@@ -170,25 +215,41 @@ export function ImportData() {
               <div className="relative w-full">
                 <img src={imagePreview} alt="Preview" className="w-full h-auto max-h-[400px] object-contain rounded-xl" />
                 <button 
-                  className="absolute top-2 right-2 bg-[#131B2F] text-slate-700 p-2 rounded-full shadow-lg hover:bg-red-50 hover:text-rose-400 transition-colors"
+                  className="absolute top-2 right-2 bg-[#131B2F] text-slate-300 p-2 rounded-full shadow-lg hover:bg-rose-500/20 hover:text-rose-400 transition-colors"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setImagePreview(null);
-                    setExtractedData(null);
-                    setSuccess('');
+                    resetAll();
                   }}
                 >
                   <RefreshCw className="w-5 h-5" />
                 </button>
               </div>
             ) : (
-              <>
+              <div className="flex flex-col items-center w-full">
                 <div className="w-16 h-16 bg-[#1E293B] rounded-full flex items-center justify-center mb-4 text-sky-400">
-                  <UploadCloud className="w-8 h-8" />
+                  <Camera className="w-8 h-8" />
                 </div>
-                <h3 className="font-semibold text-white mb-1">Clique para enviar imagem</h3>
-                <p className="text-sm text-slate-400">PNG ou JPG com recibos ou extratos</p>
-              </>
+                <h3 className="font-semibold text-white mb-1">Enviar Comprovante</h3>
+                <p className="text-sm text-slate-400 mb-8">Tire uma foto ou escolha da galeria</p>
+
+                <div className="flex flex-col sm:flex-row gap-4 w-full px-4">
+                  <Button 
+                    onClick={() => cameraInputRef.current?.click()} 
+                    className="flex-1 shadow-lg shadow-sky-500/20"
+                  >
+                    <Camera className="w-5 h-5 mr-2" />
+                    Tirar Foto
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => galleryInputRef.current?.click()} 
+                    className="flex-1 bg-[#1E293B] border-slate-700"
+                  >
+                    <ImageIcon className="w-5 h-5 mr-2 text-slate-300" />
+                    <span className="text-slate-300">Galeria / Print</span>
+                  </Button>
+                </div>
+              </div>
             )}
           </div>
 
@@ -196,7 +257,7 @@ export function ImportData() {
             <Button 
               onClick={handleExtract} 
               loading={loading}
-              className="w-full h-12 text-base"
+              className="w-full h-12 text-base shadow-lg shadow-sky-500/20"
             >
               <FileText className="w-5 h-5 mr-2" />
               Analisar e Extrair Dados (IA)
@@ -220,84 +281,97 @@ export function ImportData() {
 
         {/* Results Column */}
         {extractedData && (
-          <div className="bg-[#131B2F] p-6 rounded-3xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-[#1E293B] flex flex-col h-full max-h-[600px]">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="font-semibold text-white text-lg">Dados Extraídos</h3>
-              <span className="text-sm font-medium bg-[#1E293B] text-slate-300 py-1 px-3 rounded-full">
-                {extractedData.length} itens
-              </span>
-            </div>
+          <div className="bg-[#131B2F] p-6 rounded-3xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-[#1E293B] flex flex-col h-full">
+            <h3 className="font-semibold text-white text-lg mb-6 border-b border-[#1E293B] pb-4">Comprovante Identificado</h3>
 
-            <div className="space-y-4 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Destino: Conta</label>
-                <select 
-                  value={selectedAccountId}
-                  onChange={(e) => setSelectedAccountId(e.target.value)}
-                  className="w-full h-11 px-4 rounded-xl border border-[#1E293B] focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-[#131B2F] text-white"
-                >
-                  <option value="" disabled>Selecione a conta</option>
-                  {accounts.map(a => (
-                    <option key={a.id} value={a.id}>{a.name}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Destino: Categoria Padrão (Opcional)</label>
-                <select 
-                  value={selectedCategoryId}
-                  onChange={(e) => setSelectedCategoryId(e.target.value)}
-                  className="w-full h-11 px-4 rounded-xl border border-[#1E293B] focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-[#131B2F] text-white"
-                >
-                  <option value="">Nenhuma</option>
-                  {categories.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto min-h-[200px] border-t border-[#1E293B] pt-4 -mx-2 px-2">
-              <div className="space-y-3">
-                {extractedData.map((tx, idx) => (
-                  <div key={idx} className="group flex items-center justify-between p-3 rounded-xl border border-[#1E293B] bg-[#1E293B] hover:border-teal-200 transition-colors">
-                    <div>
-                      <p className="font-medium text-white text-sm">{tx.description}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${tx.type === 'expense' ? 'bg-rose-400/10 text-rose-400' : 'bg-emerald-400/10 text-emerald-400'}`}>
-                          {tx.type === 'expense' ? 'Saída' : 'Entrada'}
-                        </span>
-                        <span className="text-xs text-slate-400">{tx.date}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className={`font-semibold ${tx.type === 'expense' ? 'text-rose-400' : 'text-emerald-400'}`}>
-                        {tx.type === 'expense' ? '-' : '+'}R$ {tx.amount.toFixed(2)}
-                      </span>
-                      <button onClick={() => removeItem(idx)} className="text-slate-400 hover:text-rose-400 transition-colors opacity-0 group-hover:opacity-100">
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
+            {isEditing ? (
+              <form onSubmit={saveEdit} className="space-y-4 mb-6 flex-1">
+                <Input 
+                  label="Estabelecimento / Descrição"
+                  value={editDesc}
+                  onChange={(e) => setEditDesc(e.target.value)}
+                  required
+                />
+                <Input 
+                  label="Valor Total (R$)"
+                  type="number"
+                  step="0.01"
+                  value={editAmount}
+                  onChange={(e) => setEditAmount(e.target.value)}
+                  required
+                />
+                <Input 
+                  label="Data da Compra"
+                  type="date"
+                  value={editDate}
+                  onChange={(e) => setEditDate(e.target.value)}
+                  required
+                />
+                <Input 
+                  label="Número da Nota (Opcional)"
+                  value={editReceiptNumber}
+                  onChange={(e) => setEditReceiptNumber(e.target.value)}
+                />
+                <div className="pt-4 flex gap-3">
+                  <Button type="submit" className="flex-1 shadow-lg shadow-sky-500/20">Salvar Alterações</Button>
+                  <Button type="button" variant="ghost" onClick={() => setIsEditing(false)}>Cancelar</Button>
+                </div>
+              </form>
+            ) : (
+              <div className="space-y-6 flex-1">
+                <div className="bg-[#0B1121] p-5 rounded-2xl border border-slate-800/60 space-y-3">
+                  <div className="flex justify-between border-b border-slate-800/60 pb-3">
+                    <span className="text-slate-400 text-sm">Estabelecimento:</span>
+                    <span className="text-white font-medium text-right">{extractedData.description}</span>
                   </div>
-                ))}
-                {extractedData.length === 0 && (
-                  <p className="text-center text-slate-400 py-8">Nenhum dado válido extraído.</p>
-                )}
-              </div>
-            </div>
+                  <div className="flex justify-between border-b border-slate-800/60 pb-3 pt-1">
+                    <span className="text-slate-400 text-sm">Valor:</span>
+                    <span className="text-emerald-400 font-bold text-right">R$ {extractedData.amount.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-slate-800/60 pb-3 pt-1">
+                    <span className="text-slate-400 text-sm">Data:</span>
+                    <span className="text-white font-medium text-right">{extractedData.date}</span>
+                  </div>
+                  <div className="flex justify-between pt-1">
+                    <span className="text-slate-400 text-sm">Número da nota:</span>
+                    <span className="text-white font-medium text-right">{extractedData.receiptNumber || 'Não identificado'}</span>
+                  </div>
+                </div>
 
-            <div className="pt-6 mt-auto border-t border-[#1E293B]">
-              <Button 
-                onClick={handleImport} 
-                loading={loading}
-                disabled={extractedData.length === 0}
-                className="w-full"
-              >
-                <Plus className="w-5 h-5 mr-2" />
-                Salvar Lançamentos no Banco
-              </Button>
-            </div>
+                <div className="space-y-3">
+                  <label className="block text-sm font-medium text-slate-300">Escolha a conta para abater o valor:</label>
+                  <select 
+                    value={selectedAccountId}
+                    onChange={(e) => setSelectedAccountId(e.target.value)}
+                    className="w-full h-11 px-4 rounded-xl border border-[#1E293B] focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-[#0B1121] text-white"
+                  >
+                    <option value="" disabled>Selecione a conta</option>
+                    {accounts.map(a => (
+                      <option key={a.id} value={a.id}>{a.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="bg-sky-500/10 p-5 rounded-xl border border-sky-500/20 text-center mt-6">
+                  <p className="text-sky-400 font-medium mb-4">Os dados identificados estão corretos?</p>
+                  
+                  <div className="flex flex-col gap-3">
+                    <Button onClick={handleConfirmImport} loading={loading} className="w-full shadow-lg shadow-sky-500/20 h-12">
+                      <CheckCircle2 className="w-5 h-5 mr-2" />
+                      Confirmar e Abater Valor
+                    </Button>
+                    <Button variant="outline" onClick={openEdit} className="w-full h-11" disabled={loading}>
+                      <Edit2 className="w-4 h-4 mr-2" />
+                      Editar Informações
+                    </Button>
+                    <Button variant="ghost" onClick={resetAll} className="w-full h-11 text-slate-400 hover:text-rose-400" disabled={loading}>
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Tirar Outra Foto
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
