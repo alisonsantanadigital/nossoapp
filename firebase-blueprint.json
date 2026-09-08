@@ -1,0 +1,96 @@
+{
+  "project_id": "gen-lang-client-0446109044",
+  "collections": {
+    "users": {
+      "description": "User profiles and preferences",
+      "fields": {
+        "displayName": "string",
+        "email": "string",
+        "photoURL": "string",
+        "currentOrganizationId": "string",
+        "preferences": "map"
+      }
+    },
+    "organizations": {
+      "description": "Family or company organizations holding the financial data",
+      "fields": {
+        "name": "string",
+        "createdAt": "timestamp",
+        "members": "map"
+      }
+    },
+    "accounts": {
+      "description": "Bank accounts, wallets, and credit cards",
+      "fields": {
+        "orgId": "string",
+        "name": "string",
+        "type": "string",
+        "balance": "number",
+        "limit": "number",
+        "color": "string"
+      }
+    },
+    "categories": {
+      "description": "Transaction categories (e.g., Alimentação, Casa)",
+      "fields": {
+        "orgId": "string",
+        "name": "string",
+        "type": "string",
+        "icon": "string",
+        "color": "string",
+        "budget": "number"
+      }
+    },
+    "transactions": {
+      "description": "Incomes, expenses, and transfers",
+      "fields": {
+        "orgId": "string",
+        "amount": "number",
+        "type": "string",
+        "description": "string",
+        "categoryId": "string",
+        "accountId": "string",
+        "date": "timestamp",
+        "status": "string",
+        "notes": "string"
+      }
+    },
+    "bills": {
+      "description": "Scheduled or recurring bills",
+      "fields": {
+        "orgId": "string",
+        "name": "string",
+        "amount": "number",
+        "dueDate": "timestamp",
+        "categoryId": "string",
+        "accountId": "string",
+        "status": "string",
+        "recurrence": "string"
+      }
+    },
+    "goals": {
+      "description": "Financial goals and targets",
+      "fields": {
+        "orgId": "string",
+        "name": "string",
+        "targetAmount": "number",
+        "currentAmount": "number",
+        "deadline": "timestamp",
+        "image": "string",
+        "status": "string"
+      }
+    },
+    "wishlistItems": {
+      "description": "Wishlist and planned purchases",
+      "fields": {
+        "orgId": "string",
+        "name": "string",
+        "price": "number",
+        "priority": "string",
+        "dateDesired": "timestamp",
+        "link": "string",
+        "status": "string"
+      }
+    }
+  }
+}
