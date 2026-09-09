@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ShoppingBag, ExternalLink } from "lucide-react";
+import { ShoppingBag, CreditCard } from "lucide-react";
 import { EmptyState } from "../components/ui/EmptyState";
 import { Card, CardContent } from "../components/ui/Card";
 import { Button } from "../components/ui/Button";
@@ -12,15 +12,15 @@ export function Wishlist() {
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
-            Quero Comprar
+            Gastos Planejados
           </h1>
           <p className="text-slate-400 mt-1">
-            Lista de desejos integrada ao seu planejamento.
+            Programe suas próximas compras e despesas grandes.
           </p>
         </div>
         {items.length > 0 && (
           <Button className="shadow-lg shadow-sky-500/20">
-            Adicionar Item
+            Adicionar Gasto
           </Button>
         )}
       </header>
@@ -28,18 +28,18 @@ export function Wishlist() {
       {items.length === 0 ? (
         <EmptyState
           icon={<ShoppingBag className="w-8 h-8" />}
-          title="Sua lista está vazia"
-          description="Adicione itens que você deseja comprar para planejarmos juntos como encaixá-los no seu orçamento."
-          actionLabel="Adicionar Desejo"
+          title="Nenhum gasto planejado"
+          description="Registre aqui aquelas despesas ou compras que você pretende fazer no futuro, para não comprometer o orçamento do mês."
+          actionLabel="Adicionar Gasto"
           onAction={() => {
             setItems([
               {
                 id: 1,
-                name: "MacBook Air M2",
-                price: 8500,
+                name: "Troca de Pneus do Carro",
+                price: 1800,
                 priority: "Alta",
-                date: "Dez 2024",
-                emoji: "💻",
+                date: "Nov 2026",
+                emoji: "🚗",
                 status: "planned",
               },
             ]);
@@ -48,13 +48,13 @@ export function Wishlist() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((item) => (
-            <Card key={item.id} className="hover:shadow-lg transition-shadow">
+            <Card key={item.id} className="hover:shadow-lg transition-shadow bg-[#131B2F] border-slate-800/60">
               <CardContent className="p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div className="w-12 h-12 bg-[#1E293B] rounded-xl flex items-center justify-center text-2xl">
                     {item.emoji}
                   </div>
-                  <span className="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-full">
+                  <span className="text-xs font-medium text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded-full">
                     Prioridade {item.priority}
                   </span>
                 </div>
@@ -62,7 +62,7 @@ export function Wishlist() {
                   {item.name}
                 </h3>
                 <p className="text-2xl font-bold text-white mb-4">
-                  R$ {item.price}
+                  R$ {item.price.toFixed(2)}
                 </p>
 
                 <div className="space-y-3">
@@ -74,9 +74,9 @@ export function Wishlist() {
                       {item.date}
                     </span>
                   </div>
-                  <Button variant="outline" className="w-full" size="sm">
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Ver na Loja
+                  <Button variant="outline" className="w-full border-slate-700 hover:bg-slate-800 text-slate-300" size="sm">
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Registrar Pagamento
                   </Button>
                 </div>
               </CardContent>
@@ -87,3 +87,4 @@ export function Wishlist() {
     </div>
   );
 }
+

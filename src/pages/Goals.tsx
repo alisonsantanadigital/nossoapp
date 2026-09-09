@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Target, Trash2 } from "lucide-react";
+import React, { useState, useEffect, useMemo } from "react";
+import { Target, Trash2, TrendingUp, TrendingDown, PiggyBank } from "lucide-react";
 import {
   collection,
   addDoc,
@@ -7,8 +7,7 @@ import {
   query,
   where,
   deleteDoc,
-  doc,
-  updateDoc,
+  doc
 } from "firebase/firestore";
 import { db, handleFirestoreError, OperationType } from "../lib/firebase";
 import { useOrg } from "../contexts/OrgContext";
@@ -18,11 +17,12 @@ import { Button } from "../components/ui/Button";
 import { Modal } from "../components/ui/Modal";
 import { Input } from "../components/ui/Input";
 import { formatCurrency } from "../lib/utils";
-import type { Goal } from "../types";
+import type { Goal, Transaction } from "../types";
 
 export function Goals() {
   const { organization } = useOrg();
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Modal state
@@ -32,38 +32,59 @@ export function Goals() {
   // Form state
   const [name, setName] = useState("");
   const [targetAmount, setTargetAmount] = useState("");
-  const [currentAmount, setCurrentAmount] = useState("");
-  const [deadline, setDeadline] = useState("");
-  const [emoji, setEmoji] = useState("🎯");
-
+  const [type, setType] = useState<"savings" | "income" | "expense">("savings");
+  
   useEffect(() => {
     if (!organization?.id) return;
 
-    const q = query(
+    const qGoals = query(
       collection(db, "goals"),
       where("orgId", "==", organization.id),
     );
 
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const goalsData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-          deadline: doc.data().deadline?.toDate() || new Date(),
-        })) as Goal[];
+    const unsubGoals = onSnapshot(qGoals, (snapshot) => {
+      const goalsData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        deadline: doc.data().deadline?.toDate() || new Date(),
+      })) as Goal[];
+      setGoals(goalsData);
+    });
 
-        setGoals(goalsData);
-        setLoading(false);
-      },
-      (error) => {
-        handleFirestoreError(error, OperationType.LIST, "goals");
-        setLoading(false);
-      },
+    const qTx = query(
+      collection(db, "transactions"),
+      where("orgId", "==", organization.id)
     );
 
-    return () => unsubscribe();
+    const unsubTx = onSnapshot(qTx, (snapshot) => {
+      const txs = snapshot.docs.map(doc => ({
+        ...doc.data(),
+        date: doc.data().date?.toDate() || new Date()
+      })) as Transaction[];
+      setTransactions(txs);
+      setLoading(false);
+    });
+
+    return () => {
+      unsubGoals();
+      unsubTx();
+    };
   }, [organization?.id]);
+
+  const currentMonthData = useMemo(() => {
+    const now = new Date();
+    let income = 0;
+    let expense = 0;
+
+    transactions.forEach(tx => {
+      if (tx.date.getMonth() === now.getMonth() && tx.date.getFullYear() === now.getFullYear()) {
+        if (tx.type === 'income') income += tx.amount;
+        else expense += tx.amount;
+      }
+    });
+
+    return { income, expense };
+  }, [transactions]);
 
   const handleAddGoal = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,9 +96,8 @@ export function Goals() {
         orgId: organization.id,
         name,
         targetAmount: Number(targetAmount),
-        currentAmount: Number(currentAmount) || 0,
-        deadline: new Date(deadline),
-        emoji,
+        currentAmount: 0, // Used for legacy/savings
+        type: type,
         status: "active",
       });
       setIsModalOpen(false);
@@ -103,9 +123,32 @@ export function Goals() {
   const resetForm = () => {
     setName("");
     setTargetAmount("");
-    setCurrentAmount("");
-    setDeadline("");
-    setEmoji("🎯");
+    setType("savings");
+  };
+
+  const getGoalProgress = (goal: any) => {
+    const goalType = goal.type || 'savings';
+    let current = goal.currentAmount || 0;
+    
+    if (goalType === 'income') {
+      current = currentMonthData.income;
+    } else if (goalType === 'expense') {
+      current = currentMonthData.expense;
+    }
+
+    const percentage = Math.min(100, Math.max(0, (current / goal.targetAmount) * 100));
+    
+    return {
+      current,
+      percentage,
+      isDanger: goalType === 'expense' && current > goal.targetAmount
+    };
+  };
+
+  const getGoalIcon = (type: string) => {
+    if (type === 'income') return <TrendingUp className="w-10 h-10 text-emerald-400" />;
+    if (type === 'expense') return <TrendingDown className="w-10 h-10 text-rose-400" />;
+    return <PiggyBank className="w-10 h-10 text-sky-400" />;
   };
 
   return (
@@ -113,85 +156,93 @@ export function Goals() {
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
-            Metas
+            Metas Concretas
           </h1>
           <p className="text-slate-400 mt-1">
-            Acompanhe seus grandes objetivos financeiros.
+            Defina limites de gastos ou metas de receita baseados em seus dados reais.
           </p>
         </div>
-        {goals.length > 0 && (
-          <Button
-            onClick={() => setIsModalOpen(true)}
-            className="shadow-lg shadow-sky-500/20"
-          >
-            Nova Meta
-          </Button>
-        )}
+        <Button
+          onClick={() => setIsModalOpen(true)}
+          className="shadow-lg shadow-sky-500/20"
+        >
+          Nova Meta
+        </Button>
       </header>
 
       {!loading && goals.length === 0 ? (
         <EmptyState
           icon={<Target className="w-8 h-8" />}
           title="Nenhuma meta definida"
-          description="Você ainda não definiu nenhum objetivo financeiro. Que tal começar a planejar o futuro hoje?"
+          description="Você ainda não definiu nenhum objetivo financeiro. Que tal definir um limite de gastos para o mês?"
           actionLabel="Criar Primeira Meta"
           onAction={() => setIsModalOpen(true)}
         />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {goals.map((goal) => (
-            <Card
-              key={goal.id}
-              className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer relative group"
-            >
-              <button
-                onClick={(e) => handleDeleteGoal(goal.id, e)}
-                className="absolute top-4 right-4 p-2 bg-[#131B2F]/80 hover:bg-red-50 text-slate-400 hover:text-rose-400 rounded-full opacity-0 group-hover:opacity-100 transition-all z-10"
+          {goals.map((goal) => {
+            const { current, percentage, isDanger } = getGoalProgress(goal);
+            const goalType = goal.type || 'savings';
+
+            return (
+              <Card
+                key={goal.id}
+                className="overflow-hidden hover:shadow-lg transition-shadow relative group bg-[#131B2F] border-slate-800/60"
               >
-                <Trash2 className="w-4 h-4" />
-              </button>
-              <div className="h-32 bg-[#1E293B] flex items-center justify-center text-5xl">
-                {(goal as any).emoji || "🎯"}
-              </div>
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-lg text-white mb-2">
-                  {goal.name}
-                </h3>
-
-                <div className="flex justify-between items-end mb-2">
-                  <div>
-                    <p className="text-xs text-slate-400 font-medium">
-                      Acumulado
-                    </p>
-                    <p className="text-lg font-bold text-white">
-                      {formatCurrency(goal.currentAmount)}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-slate-400 font-medium">
-                      Objetivo
-                    </p>
-                    <p className="text-sm font-medium text-slate-300">
-                      {formatCurrency(goal.targetAmount)}
-                    </p>
-                  </div>
+                <button
+                  onClick={(e) => handleDeleteGoal(goal.id, e)}
+                  className="absolute top-4 right-4 p-2 bg-[#1E293B] hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 rounded-full opacity-0 group-hover:opacity-100 transition-all z-10"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+                <div className="h-24 bg-[#1E293B] flex items-center justify-center border-b border-slate-800/60">
+                  {getGoalIcon(goalType)}
                 </div>
+                <CardContent className="p-6">
+                  <div className="mb-4">
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-md bg-slate-800 text-slate-300">
+                      {goalType === 'income' ? 'Meta de Receita' : goalType === 'expense' ? 'Limite de Gastos' : 'Economia'}
+                    </span>
+                  </div>
+                  <h3 className="font-semibold text-lg text-white mb-4">
+                    {goal.name}
+                  </h3>
 
-                <div className="w-full bg-[#131B2F] rounded-full h-2.5 overflow-hidden mb-4 border border-slate-800/60">
-                  <div
-                    className="bg-sky-500 h-2.5 rounded-full"
-                    style={{
-                      width: `${Math.min(100, (goal.currentAmount / goal.targetAmount) * 100)}%`,
-                    }}
-                  ></div>
-                </div>
+                  <div className="flex justify-between items-end mb-2">
+                    <div>
+                      <p className="text-xs text-slate-400 font-medium">
+                        {goalType === 'expense' ? 'Já Gasto' : 'Alcançado'}
+                      </p>
+                      <p className={`text-lg font-bold ${isDanger ? 'text-rose-400' : 'text-white'}`}>
+                        {formatCurrency(current)}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-slate-400 font-medium">
+                        {goalType === 'expense' ? 'Limite' : 'Objetivo'}
+                      </p>
+                      <p className="text-sm font-medium text-slate-300">
+                        {formatCurrency(goal.targetAmount)}
+                      </p>
+                    </div>
+                  </div>
 
-                <p className="text-xs text-slate-400 text-center font-medium bg-[#131B2F] border border-slate-800/60 py-2 rounded-lg">
-                  Prazo: {goal.deadline.toLocaleDateString("pt-BR")}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+                  <div className="w-full bg-[#1E293B] rounded-full h-2.5 overflow-hidden border border-slate-800/60">
+                    <div
+                      className={`h-2.5 rounded-full ${
+                        isDanger 
+                          ? 'bg-rose-500' 
+                          : goalType === 'income' 
+                            ? 'bg-emerald-500' 
+                            : 'bg-sky-500'
+                      }`}
+                      style={{ width: `${percentage}%` }}
+                    ></div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
 
@@ -201,50 +252,49 @@ export function Goals() {
         title="Nova Meta"
       >
         <form onSubmit={handleAddGoal} className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-300">Tipo de Meta</label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setType('income')}
+                className={`p-3 rounded-xl border text-sm font-medium transition-all ${
+                  type === 'income' 
+                    ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400' 
+                    : 'bg-[#1E293B] border-slate-700 text-slate-400 hover:text-white'
+                }`}
+              >
+                Meta de Renda
+              </button>
+              <button
+                type="button"
+                onClick={() => setType('expense')}
+                className={`p-3 rounded-xl border text-sm font-medium transition-all ${
+                  type === 'expense' 
+                    ? 'bg-rose-500/20 border-rose-500 text-rose-400' 
+                    : 'bg-[#1E293B] border-slate-700 text-slate-400 hover:text-white'
+                }`}
+              >
+                Limite de Gastos
+              </button>
+            </div>
+          </div>
           <Input
             label="Nome da Meta"
-            placeholder="Ex: Viagem para Europa"
+            placeholder={type === 'income' ? 'Ex: Fazer R$ 10.000 no mês' : 'Ex: Gastar no máximo R$ 3.000'}
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
           />
-          <div className="flex gap-4">
-            <Input
-              label="Emoji"
-              placeholder="🎯"
-              value={emoji}
-              onChange={(e) => setEmoji(e.target.value)}
-              className="w-20 text-center text-lg"
-              maxLength={2}
-            />
-            <Input
-              label="Prazo (Data)"
-              type="date"
-              value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
-              className="flex-1"
-              required
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label="Valor Objetivo (R$)"
-              type="number"
-              step="0.01"
-              placeholder="10000.00"
-              value={targetAmount}
-              onChange={(e) => setTargetAmount(e.target.value)}
-              required
-            />
-            <Input
-              label="Já Guardado (R$)"
-              type="number"
-              step="0.01"
-              placeholder="0.00"
-              value={currentAmount}
-              onChange={(e) => setCurrentAmount(e.target.value)}
-            />
-          </div>
+          <Input
+            label="Valor Objetivo (R$)"
+            type="number"
+            step="0.01"
+            placeholder="0.00"
+            value={targetAmount}
+            onChange={(e) => setTargetAmount(e.target.value)}
+            required
+          />
           <div className="pt-4 flex justify-end gap-3">
             <Button
               type="button"
@@ -262,3 +312,4 @@ export function Goals() {
     </div>
   );
 }
+

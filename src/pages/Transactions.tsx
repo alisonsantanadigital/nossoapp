@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   CreditCard,
   ArrowDownRight,
@@ -36,6 +36,7 @@ export function Transactions() {
   const { organization } = useOrg();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTabKey, setActiveTabKey] = useState<string>("");
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -84,6 +85,53 @@ export function Transactions() {
 
     return () => unsubscribe();
   }, [organization?.id]);
+
+  const groupedTransactions = useMemo(() => {
+    const groups: {
+      monthYear: string;
+      sortKey: string;
+      income: number;
+      expense: number;
+      items: Transaction[];
+    }[] = [];
+
+    transactions.forEach((tx) => {
+      const monthYear = tx.date.toLocaleString("pt-BR", {
+        month: "long",
+        year: "numeric",
+      });
+      const capitalizedMonth =
+        monthYear.charAt(0).toUpperCase() + monthYear.slice(1);
+      const sortKey = `${tx.date.getFullYear()}-${String(tx.date.getMonth()).padStart(2, "0")}`;
+
+      let group = groups.find((g) => g.sortKey === sortKey);
+      if (!group) {
+        group = {
+          monthYear: capitalizedMonth,
+          sortKey,
+          income: 0,
+          expense: 0,
+          items: [],
+        };
+        groups.push(group);
+      }
+
+      group.items.push(tx);
+      if (tx.type === "income") {
+        group.income += tx.amount;
+      } else {
+        group.expense += tx.amount;
+      }
+    });
+
+    return groups.sort((a, b) => b.sortKey.localeCompare(a.sortKey));
+  }, [transactions]);
+
+  useEffect(() => {
+    if (groupedTransactions.length > 0 && !groupedTransactions.find(g => g.sortKey === activeTabKey)) {
+      setActiveTabKey(groupedTransactions[0].sortKey);
+    }
+  }, [groupedTransactions, activeTabKey]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -231,82 +279,122 @@ export function Transactions() {
         </Button>
       </header>
 
+      {groupedTransactions.length > 0 && (
+        <div className="flex overflow-x-auto gap-2 pb-4 scrollbar-none">
+          {groupedTransactions.map((group) => (
+            <button
+              key={group.sortKey}
+              onClick={() => setActiveTabKey(group.sortKey)}
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${activeTabKey === group.sortKey ? "bg-sky-500 text-white" : "bg-[#1E293B] text-slate-400 hover:text-white"}`}
+            >
+              {group.monthYear}
+            </button>
+          ))}
+        </div>
+      )}
+
       {!loading && transactions.length === 0 ? (
         <EmptyState
           icon={<CreditCard className="w-8 h-8" />}
           title="Nenhuma movimentação"
-          description="🌱 Sua vida financeira começa aqui. Adicione sua primeira despesa ou receita para começar a acompanhar seus gastos."
+          description="🌱 Nenhuma movimentação encontrada."
           actionLabel="Adicionar Lançamento"
           onAction={handleOpenNew}
         />
       ) : (
-        <div className="bg-[#131B2F] rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-slate-800/60 overflow-hidden">
-          <div className="divide-y divide-slate-800/60">
-            {transactions.map((tx) => (
-              <div
-                key={tx.id}
-                className="p-4 sm:px-6 flex items-center justify-between hover:bg-[#1E293B] transition-colors group"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-[#1E293B] flex items-center justify-center text-xl shadow-inner border border-slate-800/60 overflow-hidden shrink-0 relative">
-                    {tx.imageUrl ? (
-                      <img
-                        src={tx.imageUrl}
-                        alt={tx.description}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      tx.emoji || (tx.type === "expense" ? "💸" : "💰")
-                    )}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-semibold text-white">
-                        {tx.description}
-                      </h4>
-                      {tx.isFixed && (
-                        <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                          Fixa
-                        </span>
-                      )}
-                      {tx.installmentInfo && (
-                        <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                          Parc. {tx.installmentInfo}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-slate-400">
-                      {tx.date.toLocaleDateString("pt-BR")}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <span
-                      className={`font-bold ${tx.type === "income" ? "text-emerald-400" : "text-white"}`}
-                    >
-                      {tx.type === "income" ? "+" : "-"}{" "}
-                      {formatCurrency(tx.amount)}
+        <div className="space-y-8">
+          {groupedTransactions.filter(g => g.sortKey === activeTabKey).map((group) => (
+            <div key={group.sortKey} className="space-y-4">
+              <div className="flex justify-between items-end px-1 border-b border-slate-800/60 pb-2">
+                <h3 className="text-lg font-semibold text-white">
+                  Resumo do Mês
+                </h3>
+                <div className="flex gap-4 text-sm">
+                  <div className="flex flex-col items-end">
+                    <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Entradas</span>
+                    <span className="text-emerald-400 font-medium">
+                      +{formatCurrency(group.income)}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => openEditModal(tx)}
-                      className="p-2 text-slate-500 hover:text-sky-400 hover:bg-sky-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteTransaction(tx.id)}
-                      className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                  <div className="flex flex-col items-end">
+                    <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Saídas</span>
+                    <span className="text-rose-400 font-medium">
+                      -{formatCurrency(group.expense)}
+                    </span>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+
+              <div className="bg-[#131B2F] rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-slate-800/60 overflow-hidden">
+                <div className="divide-y divide-slate-800/60">
+                  {group.items.map((tx) => (
+                    <div
+                      key={tx.id}
+                      className="p-4 sm:px-6 flex items-center justify-between hover:bg-[#1E293B] transition-colors group"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-[#1E293B] flex items-center justify-center text-xl shadow-inner border border-slate-800/60 overflow-hidden shrink-0 relative">
+                          {tx.imageUrl ? (
+                            <img
+                              src={tx.imageUrl}
+                              alt={tx.description}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            tx.emoji || (tx.type === "expense" ? "💸" : "💰")
+                          )}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-semibold text-white">
+                              {tx.description}
+                            </h4>
+                            {tx.isFixed && (
+                              <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                                Fixa
+                              </span>
+                            )}
+                            {tx.installmentInfo && (
+                              <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                Parc. {tx.installmentInfo}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm text-slate-400">
+                            {tx.date.toLocaleDateString("pt-BR")}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <span
+                            className={`font-bold ${tx.type === "income" ? "text-emerald-400" : "text-white"}`}
+                          >
+                            {tx.type === "income" ? "+" : "-"}{" "}
+                            {formatCurrency(tx.amount)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => openEditModal(tx)}
+                            className="p-2 text-slate-500 hover:text-sky-400 hover:bg-sky-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteTransaction(tx.id)}
+                            className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
