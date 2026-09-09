@@ -8,8 +8,8 @@ export interface UserProfile {
   photoURL?: string;
   currentOrganizationId?: string;
   preferences?: Record<string, any>;
-  status?: 'active' | 'inactive';
-  appRole?: 'admin' | 'user';
+  status?: "active" | "inactive";
+  appRole?: "admin" | "user";
 }
 
 export interface Organization {

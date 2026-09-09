@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
-import { X } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import React, { useEffect, useRef } from "react";
+import { X } from "lucide-react";
+import { cn } from "../../lib/utils";
 
 interface ModalProps {
   isOpen: boolean;
@@ -10,22 +10,28 @@ interface ModalProps {
   className?: string;
 }
 
-export function Modal({ isOpen, onClose, title, children, className }: ModalProps) {
+export function Modal({
+  isOpen,
+  onClose,
+  title,
+  children,
+  className,
+}: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === "Escape") onClose();
     };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden";
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
     };
   }, [isOpen, onClose]);
 
@@ -33,32 +39,30 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-0">
-      <div 
+      <div
         className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
-      
-      <div 
+
+      <div
         ref={modalRef}
         className={cn(
           "relative bg-[#131B2F] rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all",
           "animate-in fade-in zoom-in-95 duration-200",
-          className
+          className,
         )}
       >
         <div className="flex items-center justify-between p-6 border-b border-[#1E293B]">
           <h3 className="text-xl font-bold text-white">{title}</h3>
-          <button 
+          <button
             onClick={onClose}
             className="p-2 text-slate-400 hover:text-slate-300 hover:bg-[#1E293B] rounded-full transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
-        
-        <div className="p-6 max-h-[80vh] overflow-y-auto">
-          {children}
-        </div>
+
+        <div className="p-6 max-h-[80vh] overflow-y-auto">{children}</div>
       </div>
     </div>
   );

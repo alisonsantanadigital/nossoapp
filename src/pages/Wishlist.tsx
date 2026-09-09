@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { ShoppingBag, ExternalLink } from 'lucide-react';
-import { EmptyState } from '../components/ui/EmptyState';
-import { Card, CardContent } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
+import React, { useState } from "react";
+import { ShoppingBag, ExternalLink } from "lucide-react";
+import { EmptyState } from "../components/ui/EmptyState";
+import { Card, CardContent } from "../components/ui/Card";
+import { Button } from "../components/ui/Button";
 
 export function Wishlist() {
   const [items, setItems] = useState<any[]>([]);
@@ -11,11 +11,17 @@ export function Wishlist() {
     <div className="space-y-6">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">Quero Comprar</h1>
-          <p className="text-slate-400 mt-1">Lista de desejos integrada ao seu planejamento.</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+            Quero Comprar
+          </h1>
+          <p className="text-slate-400 mt-1">
+            Lista de desejos integrada ao seu planejamento.
+          </p>
         </div>
         {items.length > 0 && (
-          <Button className="shadow-lg shadow-sky-500/20">Adicionar Item</Button>
+          <Button className="shadow-lg shadow-sky-500/20">
+            Adicionar Item
+          </Button>
         )}
       </header>
 
@@ -26,15 +32,17 @@ export function Wishlist() {
           description="Adicione itens que você deseja comprar para planejarmos juntos como encaixá-los no seu orçamento."
           actionLabel="Adicionar Desejo"
           onAction={() => {
-            setItems([{
-              id: 1,
-              name: 'MacBook Air M2',
-              price: 8500,
-              priority: 'Alta',
-              date: 'Dez 2024',
-              emoji: '💻',
-              status: 'planned'
-            }]);
+            setItems([
+              {
+                id: 1,
+                name: "MacBook Air M2",
+                price: 8500,
+                priority: "Alta",
+                date: "Dez 2024",
+                emoji: "💻",
+                status: "planned",
+              },
+            ]);
           }}
         />
       ) : (
@@ -50,13 +58,21 @@ export function Wishlist() {
                     Prioridade {item.priority}
                   </span>
                 </div>
-                <h3 className="font-semibold text-lg text-white mb-1">{item.name}</h3>
-                <p className="text-2xl font-bold text-white mb-4">R$ {item.price}</p>
-                
+                <h3 className="font-semibold text-lg text-white mb-1">
+                  {item.name}
+                </h3>
+                <p className="text-2xl font-bold text-white mb-4">
+                  R$ {item.price}
+                </p>
+
                 <div className="space-y-3">
                   <div className="bg-[#1E293B] p-3 rounded-xl flex items-center justify-between">
-                    <span className="text-xs text-slate-400 font-medium">Planejado para</span>
-                    <span className="text-sm font-medium text-white">{item.date}</span>
+                    <span className="text-xs text-slate-400 font-medium">
+                      Planejado para
+                    </span>
+                    <span className="text-sm font-medium text-white">
+                      {item.date}
+                    </span>
                   </div>
                   <Button variant="outline" className="w-full" size="sm">
                     <ExternalLink className="w-4 h-4 mr-2" />

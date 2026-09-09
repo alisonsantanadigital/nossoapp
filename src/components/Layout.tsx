@@ -1,18 +1,29 @@
-import React from 'react';
-import { Link, useLocation, Outlet } from 'react-router-dom';
-import { Home, CreditCard, Target, PieChart, ShoppingBag, Plus, Bell, Settings, Menu, ScanLine } from 'lucide-react';
-import { cn } from '../lib/utils';
+import React from "react";
+import { Link, useLocation, Outlet } from "react-router-dom";
+import {
+  Home,
+  CreditCard,
+  Target,
+  PieChart,
+  ShoppingBag,
+  Plus,
+  Bell,
+  Settings,
+  Menu,
+  ScanLine,
+} from "lucide-react";
+import { cn } from "../lib/utils";
 
 export function Layout() {
   const location = useLocation();
 
   const navItems = [
-    { label: 'Início', icon: Home, path: '/' },
-    { label: 'Despesas', icon: CreditCard, path: '/transactions' },
-    { label: 'IA Leitor', icon: ScanLine, path: '/import' },
-    { label: 'Metas', icon: Target, path: '/goals' },
-    { label: 'Análises', icon: PieChart, path: '/analytics' },
-    { label: 'Desejos', icon: ShoppingBag, path: '/wishlist' },
+    { label: "Início", icon: Home, path: "/" },
+    { label: "Despesas", icon: CreditCard, path: "/transactions" },
+    { label: "IA Leitor", icon: ScanLine, path: "/import" },
+    { label: "Metas", icon: Target, path: "/goals" },
+    { label: "Análises", icon: PieChart, path: "/analytics" },
+    { label: "Desejos", icon: ShoppingBag, path: "/wishlist" },
   ];
 
   return (
@@ -24,10 +35,12 @@ export function Layout() {
             <div className="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center">
               <Home className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-xl text-slate-100 tracking-tight">Nossa Casa</span>
+            <span className="font-bold text-xl text-slate-100 tracking-tight">
+              Nossa Casa
+            </span>
           </div>
         </div>
-        
+
         <nav className="flex-1 px-4 space-y-1 mt-4">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
@@ -37,20 +50,28 @@ export function Layout() {
                 to={item.path}
                 className={cn(
                   "flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200",
-                  isActive 
-                    ? "bg-sky-400/10 text-sky-300" 
-                    : "text-slate-400 hover:bg-[#1E293B] hover:text-white"
+                  isActive
+                    ? "bg-sky-400/10 text-sky-300"
+                    : "text-slate-400 hover:bg-[#1E293B] hover:text-white",
                 )}
               >
-                <item.icon className={cn("w-5 h-5", isActive ? "text-sky-400" : "text-slate-400")} />
+                <item.icon
+                  className={cn(
+                    "w-5 h-5",
+                    isActive ? "text-sky-400" : "text-slate-400",
+                  )}
+                />
                 {item.label}
               </Link>
-            )
+            );
           })}
         </nav>
 
         <div className="p-4 mt-auto">
-          <Link to="/settings" className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-[#1E293B] hover:text-white transition-all duration-200">
+          <Link
+            to="/settings"
+            className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-[#1E293B] hover:text-white transition-all duration-200"
+          >
             <Settings className="w-5 h-5 text-slate-400" />
             Configurações
           </Link>
@@ -74,7 +95,7 @@ export function Layout() {
               to={item.path}
               className={cn(
                 "flex flex-col items-center justify-center w-16 py-2 gap-1 rounded-xl transition-colors",
-                isActive ? "text-sky-400" : "text-slate-400 hover:text-white"
+                isActive ? "text-sky-400" : "text-slate-400 hover:text-white",
               )}
             >
               <item.icon className="w-5 h-5" />
@@ -82,7 +103,10 @@ export function Layout() {
             </Link>
           );
         })}
-        <Link to="/settings" className="flex flex-col items-center justify-center w-16 py-2 gap-1 rounded-xl text-slate-400 transition-colors">
+        <Link
+          to="/settings"
+          className="flex flex-col items-center justify-center w-16 py-2 gap-1 rounded-xl text-slate-400 transition-colors"
+        >
           <Menu className="w-5 h-5" />
           <span className="text-[10px] font-medium">Mais</span>
         </Link>

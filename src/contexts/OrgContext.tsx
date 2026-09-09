@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../lib/firebase';
-import { useAuth } from './AuthContext';
-import type { Organization } from '../types';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../lib/firebase";
+import { useAuth } from "./AuthContext";
+import type { Organization } from "../types";
 
 interface OrgContextType {
   organization: Organization | null;
@@ -18,14 +18,16 @@ const OrgContext = createContext<OrgContextType>({
 
 export const useOrg = () => useContext(OrgContext);
 
-export const OrgProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const OrgProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { userProfile } = useAuth();
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [loadingOrg, setLoadingOrg] = useState(true);
 
   const fetchOrg = async (orgId: string) => {
     try {
-      const docRef = doc(db, 'organizations', orgId);
+      const docRef = doc(db, "organizations", orgId);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         setOrganization({ id: docSnap.id, ...docSnap.data() } as Organization);
