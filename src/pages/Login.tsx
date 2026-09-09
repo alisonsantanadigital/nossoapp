@@ -132,17 +132,17 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B1121] flex flex-col justify-center items-center p-4">
-      <div className="w-full max-w-md bg-[#131B2F] p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#1E293B] mb-6">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4">
+      <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200 mb-6">
         <div className="flex justify-center mb-6">
           <div className="w-12 h-12 rounded-xl bg-sky-500 flex items-center justify-center shadow-lg shadow-sky-500/20">
-            <Home className="w-7 h-7 text-white" />
+            <Home className="w-7 h-7 text-slate-900" />
           </div>
         </div>
-        <h1 className="text-2xl font-bold text-center text-white mb-2">
+        <h1 className="text-2xl font-bold text-center text-slate-900 mb-2">
           Bem-vindo à Nossa Casa
         </h1>
-        <p className="text-center text-slate-400 mb-8 text-sm">
+        <p className="text-center text-slate-500 mb-8 text-sm">
           O painel de controle financeiro da sua família.
         </p>
 
@@ -170,7 +170,7 @@ export function Login() {
             <p className="text-rose-400 text-sm text-center">{error}</p>
           )}
           {success && (
-            <p className="text-sky-400 text-sm text-center font-medium bg-sky-400/10 p-2 rounded-lg">
+            <p className="text-sky-600 text-sm text-center font-medium bg-sky-400/10 p-2 rounded-lg">
               {success}
             </p>
           )}
@@ -179,14 +179,14 @@ export function Login() {
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
-                className="rounded text-sky-400 focus:ring-teal-600 w-4 h-4 border-slate-700"
+                className="rounded text-sky-600 focus:ring-teal-600 w-4 h-4 border-slate-300"
               />
-              <span className="text-sm text-slate-300">Lembrar-me</span>
+              <span className="text-sm text-slate-600">Lembrar-me</span>
             </label>
             <button
               onClick={handleResetPassword}
               type="button"
-              className="text-sm font-medium text-sky-400 hover:text-sky-300"
+              className="text-sm font-medium text-sky-600 hover:text-sky-700"
             >
               Esqueci a senha
             </button>
@@ -197,11 +197,11 @@ export function Login() {
           </Button>
         </form>
 
-        <p className="text-center text-slate-400 text-sm mt-8">
+        <p className="text-center text-slate-500 text-sm mt-8">
           Ainda não tem uma conta?{" "}
           <Link
             to="/register"
-            className="font-medium text-sky-400 hover:text-sky-300"
+            className="font-medium text-sky-600 hover:text-sky-700"
           >
             Criar agora
           </Link>
@@ -211,7 +211,7 @@ export function Login() {
       <button
         onClick={handleAutoCreateAccounts}
         disabled={loading}
-        className="flex items-center gap-2 px-4 py-3 bg-[#131B2F] border border-[#1E293B] rounded-xl text-slate-300 text-sm font-medium hover:bg-[#1E293B] transition-colors shadow-sm"
+        className="flex items-center gap-2 px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-600 text-sm font-medium hover:bg-slate-100 transition-colors shadow-sm"
       >
         <Zap className="w-4 h-4 text-amber-500" />
         Configurar contas "alisonsan" e "laysan" automaticamente

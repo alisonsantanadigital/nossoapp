@@ -151,10 +151,10 @@ export function Analytics() {
     <div className="space-y-6">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
             Análise Financeira
           </h1>
-          <p className="text-slate-400 mt-1">
+          <p className="text-slate-500 mt-1">
             Visão detalhada e histórica do seu comportamento financeiro.
           </p>
         </div>
@@ -170,10 +170,10 @@ export function Analytics() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
           {/* Evolução Mensal */}
-          <Card className="col-span-1 lg:col-span-2 bg-[#131B2F] border-slate-800/60">
+          <Card className="col-span-1 lg:col-span-2 bg-white border-slate-200/60">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-sky-400" />
+                <BarChart3 className="w-5 h-5 text-sky-600" />
                 Evolução Mensal (Entradas vs Saídas)
               </CardTitle>
             </CardHeader>
@@ -184,9 +184,9 @@ export function Analytics() {
                   <XAxis dataKey="month" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
                   <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `R$ ${val}`} />
                   <Tooltip 
-                    cursor={{fill: '#1E293B', opacity: 0.4}}
-                    contentStyle={{ backgroundColor: '#0F172A', borderColor: '#1E293B', borderRadius: '8px', color: '#fff' }}
-                    itemStyle={{ color: '#fff' }}
+                    cursor={{fill: '#e2e8f0', opacity: 0.4}}
+                    contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', color: '#0f172a' }}
+                    itemStyle={{ color: '#0f172a' }}
                   />
                   <Legend />
                   <Bar dataKey="Entradas" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={40} />
@@ -197,7 +197,7 @@ export function Analytics() {
           </Card>
 
           {/* Fluxo de Caixa (Acumulado) */}
-          <Card className="bg-[#131B2F] border-slate-800/60">
+          <Card className="bg-white border-slate-200/60">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-emerald-400" />
@@ -217,7 +217,7 @@ export function Analytics() {
                   <XAxis dataKey="date" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
                   <YAxis stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `R$ ${val}`} />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#0F172A', borderColor: '#1E293B', borderRadius: '8px', color: '#fff' }}
+                    contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', color: '#0f172a' }}
                   />
                   <Area type="monotone" dataKey="Saldo" stroke="#0ea5e9" fillOpacity={1} fill="url(#colorSaldo)" />
                 </AreaChart>
@@ -226,7 +226,7 @@ export function Analytics() {
           </Card>
 
           {/* Onde vai o dinheiro */}
-          <Card className="bg-[#131B2F] border-slate-800/60">
+          <Card className="bg-white border-slate-200/60">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <PieChartIcon className="w-5 h-5 text-rose-400" />
@@ -251,7 +251,7 @@ export function Analytics() {
                     ))}
                   </Pie>
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#0F172A', borderColor: '#1E293B', borderRadius: '8px', color: '#fff' }}
+                    contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', color: '#0f172a' }}
                     formatter={(val: number) => formatCurrency(val)}
                   />
                   <Legend verticalAlign="bottom" height={36} iconType="circle" />
@@ -261,7 +261,7 @@ export function Analytics() {
           </Card>
 
           {/* Top 5 Gastos em Barras */}
-          <Card className="bg-[#131B2F] border-slate-800/60">
+          <Card className="bg-white border-slate-200/60">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Activity className="w-5 h-5 text-amber-400" />
@@ -275,8 +275,8 @@ export function Analytics() {
                   <XAxis type="number" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `R$ ${val}`} />
                   <YAxis type="category" dataKey="name" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} width={80} />
                   <Tooltip 
-                    cursor={{fill: '#1E293B', opacity: 0.4}}
-                    contentStyle={{ backgroundColor: '#0F172A', borderColor: '#1E293B', borderRadius: '8px', color: '#fff' }}
+                    cursor={{fill: '#e2e8f0', opacity: 0.4}}
+                    contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', color: '#0f172a' }}
                   />
                   <Bar dataKey="value" fill="#f59e0b" radius={[0, 4, 4, 0]} barSize={20} />
                 </BarChart>
@@ -285,7 +285,7 @@ export function Analytics() {
           </Card>
 
           {/* Proporção Geral */}
-          <Card className="bg-[#131B2F] border-slate-800/60">
+          <Card className="bg-white border-slate-200/60">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Target className="w-5 h-5 text-indigo-400" />
@@ -309,7 +309,7 @@ export function Analytics() {
                     <Cell fill="#f43f5e" />
                   </Pie>
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#0F172A', borderColor: '#1E293B', borderRadius: '8px', color: '#fff' }}
+                    contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', color: '#0f172a' }}
                     formatter={(val: number) => formatCurrency(val)}
                   />
                   <Legend verticalAlign="bottom" height={36} iconType="circle" />

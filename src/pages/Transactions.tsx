@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import {
   CreditCard,
   ArrowDownRight,
@@ -34,6 +35,8 @@ import type { Transaction } from "../types";
 
 export function Transactions() {
   const { organization } = useOrg();
+  const location = useLocation();
+  const [filterType, setFilterType] = useState<"all" | "income" | "expense" | "pending">(location.state?.filter || "all");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTabKey, setActiveTabKey] = useState<string>("");
@@ -55,6 +58,12 @@ export function Transactions() {
   const [imageBase64, setImageBase64] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (location.state?.filter) {
+      setFilterType(location.state.filter);
+    }
+  }, [location.state?.filter]);
 
   useEffect(() => {
     if (!organization?.id) return;
@@ -95,7 +104,13 @@ export function Transactions() {
       items: Transaction[];
     }[] = [];
 
-    transactions.forEach((tx) => {
+    const filteredTransactions = transactions.filter((tx) => {
+      if (filterType === "all") return true;
+      if (filterType === "pending") return tx.status === "pending"; // if you have a pending status, or perhaps treat dummy bills this way
+      return tx.type === filterType;
+    });
+
+    filteredTransactions.forEach((tx) => {
       const monthYear = tx.date.toLocaleString("pt-BR", {
         month: "long",
         year: "numeric",
@@ -161,6 +176,12 @@ export function Transactions() {
 
   const handleAddTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!navigator.onLine) {
+      alert("Sem conexão com a internet. Verifique sua rede e tente novamente.");
+      return;
+    }
+
     if (!organization?.id) return;
     setIsSubmitting(true);
 
@@ -267,10 +288,10 @@ export function Transactions() {
     <div className="space-y-6">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
             Despesas e Receitas
           </h1>
-          <p className="text-slate-400 mt-1">
+          <p className="text-slate-500 mt-1">
             Acompanhe todas as movimentações da sua casa.
           </p>
         </div>
@@ -279,13 +300,26 @@ export function Transactions() {
         </Button>
       </header>
 
+      {/* Filters */}
+      <div className="flex overflow-x-auto gap-2 pb-4 scrollbar-none">
+        {(["all", "income", "expense", "pending"] as const).map((ft) => (
+          <button
+            key={ft}
+            onClick={() => setFilterType(ft)}
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${filterType === ft ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-500 hover:text-slate-900"}`}
+          >
+            {ft === "all" ? "Todos" : ft === "income" ? "Entradas" : ft === "expense" ? "Saídas" : "Pendentes"}
+          </button>
+        ))}
+      </div>
+
       {groupedTransactions.length > 0 && (
         <div className="flex overflow-x-auto gap-2 pb-4 scrollbar-none">
           {groupedTransactions.map((group) => (
             <button
               key={group.sortKey}
               onClick={() => setActiveTabKey(group.sortKey)}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${activeTabKey === group.sortKey ? "bg-sky-500 text-white" : "bg-[#1E293B] text-slate-400 hover:text-white"}`}
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${activeTabKey === group.sortKey ? "bg-sky-500 text-white" : "bg-slate-100 text-slate-500 hover:text-slate-900"}`}
             >
               {group.monthYear}
             </button>
@@ -305,8 +339,8 @@ export function Transactions() {
         <div className="space-y-8">
           {groupedTransactions.filter(g => g.sortKey === activeTabKey).map((group) => (
             <div key={group.sortKey} className="space-y-4">
-              <div className="flex justify-between items-end px-1 border-b border-slate-800/60 pb-2">
-                <h3 className="text-lg font-semibold text-white">
+              <div className="flex justify-between items-end px-1 border-b border-slate-200/60 pb-2">
+                <h3 className="text-lg font-semibold text-slate-900">
                   Resumo do Mês
                 </h3>
                 <div className="flex gap-4 text-sm">
@@ -325,15 +359,15 @@ export function Transactions() {
                 </div>
               </div>
 
-              <div className="bg-[#131B2F] rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-slate-800/60 overflow-hidden">
-                <div className="divide-y divide-slate-800/60">
+              <div className="bg-white rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-slate-200/60 overflow-hidden">
+                <div className="divide-y divide-slate-200">
                   {group.items.map((tx) => (
                     <div
                       key={tx.id}
-                      className="p-4 sm:px-6 flex items-center justify-between hover:bg-[#1E293B] transition-colors group"
+                      className="p-4 sm:px-6 flex items-center justify-between hover:bg-slate-100 transition-colors group"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-[#1E293B] flex items-center justify-center text-xl shadow-inner border border-slate-800/60 overflow-hidden shrink-0 relative">
+                        <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-xl shadow-inner border border-slate-200/60 overflow-hidden shrink-0 relative">
                           {tx.imageUrl ? (
                             <img
                               src={tx.imageUrl}
@@ -346,7 +380,7 @@ export function Transactions() {
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <h4 className="font-semibold text-white">
+                            <h4 className="font-semibold text-slate-900">
                               {tx.description}
                             </h4>
                             {tx.isFixed && (
@@ -360,7 +394,7 @@ export function Transactions() {
                               </span>
                             )}
                           </div>
-                          <p className="text-sm text-slate-400">
+                          <p className="text-sm text-slate-500">
                             {tx.date.toLocaleDateString("pt-BR")}
                           </p>
                         </div>
@@ -368,7 +402,7 @@ export function Transactions() {
                       <div className="flex items-center gap-4">
                         <div className="text-right">
                           <span
-                            className={`font-bold ${tx.type === "income" ? "text-emerald-400" : "text-white"}`}
+                            className={`font-bold ${tx.type === "income" ? "text-emerald-400" : "text-slate-900"}`}
                           >
                             {tx.type === "income" ? "+" : "-"}{" "}
                             {formatCurrency(tx.amount)}
@@ -377,7 +411,7 @@ export function Transactions() {
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => openEditModal(tx)}
-                            className="p-2 text-slate-500 hover:text-sky-400 hover:bg-sky-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                            className="p-2 text-slate-500 hover:text-sky-600 hover:bg-sky-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
@@ -404,18 +438,18 @@ export function Transactions() {
         title={editingId ? "Editar Lançamento" : "Novo Lançamento"}
       >
         <form onSubmit={handleAddTransaction} className="space-y-4">
-          <div className="flex p-1 bg-[#0B1121] rounded-xl mb-4 border border-slate-800/60">
+          <div className="flex p-1 bg-slate-50 rounded-xl mb-4 border border-slate-200/60">
             <button
               type="button"
               onClick={() => setType("expense")}
-              className={`flex-1 py-2 text-sm font-medium rounded-lg flex items-center justify-center transition-all ${type === "expense" ? "bg-[#1E293B] text-rose-400 shadow-sm" : "text-slate-400 hover:text-white"}`}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg flex items-center justify-center transition-all ${type === "expense" ? "bg-slate-100 text-rose-400 shadow-sm" : "text-slate-500 hover:text-slate-900"}`}
             >
               <ArrowDownRight className="w-4 h-4 mr-1" /> Despesa
             </button>
             <button
               type="button"
               onClick={() => setType("income")}
-              className={`flex-1 py-2 text-sm font-medium rounded-lg flex items-center justify-center transition-all ${type === "income" ? "bg-[#1E293B] text-emerald-400 shadow-sm" : "text-slate-400 hover:text-white"}`}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg flex items-center justify-center transition-all ${type === "income" ? "bg-slate-100 text-emerald-400 shadow-sm" : "text-slate-500 hover:text-slate-900"}`}
             >
               <ArrowUpRight className="w-4 h-4 mr-1" /> Receita
             </button>
@@ -457,13 +491,13 @@ export function Transactions() {
 
           <div className="flex gap-4 relative">
             <div className="space-y-2 w-24 shrink-0">
-              <label className="text-sm font-medium leading-none text-slate-300">
+              <label className="text-sm font-medium leading-none text-slate-600">
                 Ícone
               </label>
               <button
                 type="button"
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className="flex h-11 w-full items-center justify-center rounded-xl border border-slate-700 bg-[#0B1121] px-3 py-2 text-2xl hover:bg-slate-800 transition-colors"
+                className="flex h-11 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-2xl hover:bg-slate-100 transition-colors"
               >
                 {emoji}
               </button>
@@ -481,14 +515,14 @@ export function Transactions() {
                       setEmoji(emojiData.emoji);
                       setShowEmojiPicker(false);
                     }}
-                    theme={"dark" as any}
+                    theme={"light" as any}
                   />
                 </div>
               </div>
             )}
 
             <div className="flex-1 space-y-2">
-              <label className="text-sm font-medium leading-none text-slate-300">
+              <label className="text-sm font-medium leading-none text-slate-600">
                 Foto / Comprovante
               </label>
               <div className="flex items-center gap-3">
@@ -512,7 +546,7 @@ export function Transactions() {
                   <button
                     type="button"
                     onClick={() => setImageBase64(null)}
-                    className="p-2 text-slate-400 hover:text-rose-400"
+                    className="p-2 text-slate-500 hover:text-rose-400"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -522,7 +556,7 @@ export function Transactions() {
           </div>
 
           {imageBase64 && (
-            <div className="mt-2 rounded-xl overflow-hidden border border-slate-700 h-32 w-full flex items-center justify-center bg-[#0B1121]">
+            <div className="mt-2 rounded-xl overflow-hidden border border-slate-300 h-32 w-full flex items-center justify-center bg-slate-50">
               <img
                 src={imageBase64}
                 alt="Preview"
@@ -532,15 +566,15 @@ export function Transactions() {
           )}
 
           {!editingId && (
-            <div className="p-4 bg-[#0B1121] rounded-xl border border-slate-800/60 space-y-4">
-              <h4 className="text-sm font-medium text-slate-300 mb-2">
+            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/60 space-y-4">
+              <h4 className="text-sm font-medium text-slate-600 mb-2">
                 Recorrência e Parcelamento
               </h4>
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Repeat className="w-4 h-4 text-amber-500" />
-                  <span className="text-sm text-slate-300">
+                  <span className="text-sm text-slate-600">
                     É uma despesa fixa mensal?
                   </span>
                 </div>
@@ -559,8 +593,8 @@ export function Transactions() {
               </div>
 
               {!isFixed && (
-                <div className="flex flex-col gap-2 pt-2 border-t border-slate-800">
-                  <label className="flex items-center gap-2 text-sm text-slate-300">
+                <div className="flex flex-col gap-2 pt-2 border-t border-slate-200">
+                  <label className="flex items-center gap-2 text-sm text-slate-600">
                     <ListOrdered className="w-4 h-4 text-indigo-400" />
                     Quantidade de parcelas
                   </label>
@@ -574,7 +608,7 @@ export function Transactions() {
                     }
                   />
                   {installments > 1 && (
-                    <p className="text-xs text-slate-400 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                       O valor total de R$ {amount || "0"} será dividido em{" "}
                       {installments} vezes de R${" "}
                       {(Number(amount) / installments).toFixed(2)}.

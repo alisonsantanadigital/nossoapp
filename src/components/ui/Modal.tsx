@@ -47,16 +47,16 @@ export function Modal({
       <div
         ref={modalRef}
         className={cn(
-          "relative bg-[#131B2F] rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all",
+          "relative bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all",
           "animate-in fade-in zoom-in-95 duration-200",
           className,
         )}
       >
-        <div className="flex items-center justify-between p-6 border-b border-[#1E293B]">
-          <h3 className="text-xl font-bold text-white">{title}</h3>
+        <div className="flex items-center justify-between p-6 border-b border-slate-200">
+          <h3 className="text-xl font-bold text-slate-900">{title}</h3>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-300 hover:bg-[#1E293B] rounded-full transition-colors"
+            className="p-2 text-slate-500 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
           >
             <X className="w-5 h-5" />
           </button>

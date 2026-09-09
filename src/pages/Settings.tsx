@@ -149,19 +149,19 @@ export function Settings() {
   return (
     <div className="space-y-8 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-bold text-white tracking-tight">
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
           Configurações
         </h1>
-        <p className="text-slate-400 mt-1">
+        <p className="text-slate-500 mt-1">
           Gerencie sua conta e preferências.
         </p>
       </div>
 
-      <div className="bg-[#131B2F] p-6 rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-[#1E293B]">
-        <h2 className="text-lg font-semibold text-white mb-4">
+      <div className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-slate-200">
+        <h2 className="text-lg font-semibold text-slate-900 mb-4">
           Migração de Dados
         </h2>
-        <p className="text-slate-400 text-sm mb-4">
+        <p className="text-slate-500 text-sm mb-4">
           Importe seus registros históricos (imagens do WhatsApp) para o
           sistema. Isso os transformará em dados estruturados e editáveis.
         </p>
@@ -169,17 +169,17 @@ export function Settings() {
           onClick={handleMigration}
           loading={isMigrating}
           variant="outline"
-          className="border-sky-500/20 text-sky-400 hover:bg-sky-500/10"
+          className="border-sky-500/20 text-sky-600 hover:bg-sky-500/10"
         >
           Migrar Registros Históricos
         </Button>
         {migrationMsg && (
-          <p className="text-sm text-sky-400 mt-2">{migrationMsg}</p>
+          <p className="text-sm text-sky-600 mt-2">{migrationMsg}</p>
         )}
       </div>
 
-      <div className="bg-[#131B2F] p-6 rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-[#1E293B]">
-        <h2 className="text-lg font-semibold text-white mb-4">Alterar Senha</h2>
+      <div className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-slate-200">
+        <h2 className="text-lg font-semibold text-slate-900 mb-4">Alterar Senha</h2>
         <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-sm">
           <Input
             label="Nova Senha"
@@ -192,7 +192,7 @@ export function Settings() {
           />
           {passwordMsg.text && (
             <p
-              className={`text-sm ${passwordMsg.type === "success" ? "text-sky-400" : "text-rose-400"}`}
+              className={`text-sm ${passwordMsg.type === "success" ? "text-sky-600" : "text-rose-400"}`}
             >
               {passwordMsg.text}
             </p>
@@ -204,13 +204,13 @@ export function Settings() {
       </div>
 
       {userProfile?.appRole === "admin" && (
-        <div className="bg-[#131B2F] p-6 rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-[#1E293B]">
-          <h2 className="text-lg font-semibold text-white mb-4">
+        <div className="bg-white p-6 rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-slate-200">
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">
             Administração de Usuários
           </h2>
-          <div className="divide-y divide-slate-800/60">
+          <div className="divide-y divide-slate-200">
             {loadingUsers ? (
-              <p className="text-sm text-slate-400">Carregando...</p>
+              <p className="text-sm text-slate-500">Carregando...</p>
             ) : (
               users.map((u) => (
                 <div
@@ -218,10 +218,10 @@ export function Settings() {
                   className="py-4 flex items-center justify-between"
                 >
                   <div>
-                    <p className="font-medium text-white">
+                    <p className="font-medium text-slate-900">
                       {u.displayName} (@{u.username})
                     </p>
-                    <p className="text-sm text-slate-400">
+                    <p className="text-sm text-slate-500">
                       {u.appRole === "admin"
                         ? "Administrador"
                         : "Usuário padrão"}
@@ -233,7 +233,7 @@ export function Settings() {
                       onClick={() => toggleUserStatus(u.id, u.status)}
                       className={
                         u.status === "inactive"
-                          ? "text-sky-400"
+                          ? "text-sky-600"
                           : "text-rose-400 hover:text-rose-500 hover:bg-rose-500/10"
                       }
                     >
@@ -243,7 +243,7 @@ export function Settings() {
                     </Button>
                   )}
                   {u.id === userProfile.id && (
-                    <span className="text-sm text-slate-400 font-medium px-4">
+                    <span className="text-sm text-slate-500 font-medium px-4">
                       Você
                     </span>
                   )}
@@ -254,7 +254,7 @@ export function Settings() {
         </div>
       )}
 
-      <div className="pt-4 border-t border-[#1E293B]">
+      <div className="pt-4 border-t border-slate-200">
         <Button
           variant="outline"
           onClick={handleLogout}

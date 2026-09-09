@@ -27,7 +27,7 @@ interface ExtractedTransaction {
 
 export function ImportData() {
   const { userProfile } = useAuth();
-  const { accounts, categories } = useOrg();
+  const { organization } = useOrg();
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -45,12 +45,8 @@ export function ImportData() {
   const [editReceiptNumber, setEditReceiptNumber] = useState("");
 
   // Selected account and category to import
-  const [selectedAccountId, setSelectedAccountId] = useState(
-    accounts[0]?.id || "",
-  );
-  const [selectedCategoryId, setSelectedCategoryId] = useState(
-    categories[0]?.id || "",
-  );
+  const [selectedAccountId, setSelectedAccountId] = useState("default");
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
 
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
@@ -58,6 +54,11 @@ export function ImportData() {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (!navigator.onLine) {
+      setError("Sem conexão com a internet. Verifique sua rede e tente novamente.");
+      return;
+    }
 
     if (!file.type.startsWith("image/")) {
       setError("Por favor, selecione apenas arquivos de imagem (PNG, JPG).");
@@ -79,6 +80,11 @@ export function ImportData() {
 
   const handleExtract = async () => {
     if (!imagePreview) return;
+
+    if (!navigator.onLine) {
+      setError("Sem conexão com a internet. A leitura com IA precisa de internet.");
+      return;
+    }
 
     setLoading(true);
     setError("");
@@ -115,6 +121,12 @@ export function ImportData() {
 
   const handleConfirmImport = async () => {
     if (!extractedData) return;
+
+    if (!navigator.onLine) {
+      setError("Sem conexão com a internet. Verifique sua rede e tente novamente.");
+      return;
+    }
+
     if (!userProfile?.currentOrganizationId) {
       setError("Organização não encontrada.");
       return;
@@ -198,10 +210,10 @@ export function ImportData() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white tracking-tight">
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
           Leitura de Comprovante
         </h1>
-        <p className="text-slate-400 mt-1">
+        <p className="text-slate-500 mt-1">
           Tire uma foto pelo celular ou envie um print e nossa IA extrairá os
           dados automaticamente.
         </p>
@@ -212,7 +224,7 @@ export function ImportData() {
         <div className="space-y-4">
           <div
             className={`border-2 border-dashed rounded-3xl p-8 flex flex-col items-center justify-center text-center transition-colors min-h-[300px]
-              ${imagePreview ? "border-sky-500 bg-sky-400/10" : "border-slate-700 bg-[#131B2F]"}`}
+              ${imagePreview ? "border-sky-500 bg-sky-400/10" : "border-slate-300 bg-white"}`}
           >
             {/* Input for direct camera capture */}
             <input
@@ -240,7 +252,7 @@ export function ImportData() {
                   className="w-full h-auto max-h-[400px] object-contain rounded-xl"
                 />
                 <button
-                  className="absolute top-2 right-2 bg-[#131B2F] text-slate-300 p-2 rounded-full shadow-lg hover:bg-rose-500/20 hover:text-rose-400 transition-colors"
+                  className="absolute top-2 right-2 bg-white text-slate-600 p-2 rounded-full shadow-lg hover:bg-rose-500/20 hover:text-rose-400 transition-colors"
                   onClick={(e) => {
                     e.stopPropagation();
                     resetAll();
@@ -251,13 +263,13 @@ export function ImportData() {
               </div>
             ) : (
               <div className="flex flex-col items-center w-full">
-                <div className="w-16 h-16 bg-[#1E293B] rounded-full flex items-center justify-center mb-4 text-sky-400">
+                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-sky-600">
                   <Camera className="w-8 h-8" />
                 </div>
-                <h3 className="font-semibold text-white mb-1">
+                <h3 className="font-semibold text-slate-900 mb-1">
                   Enviar Comprovante
                 </h3>
-                <p className="text-sm text-slate-400 mb-8">
+                <p className="text-sm text-slate-500 mb-8">
                   Tire uma foto ou escolha da galeria
                 </p>
 
@@ -272,10 +284,10 @@ export function ImportData() {
                   <Button
                     variant="outline"
                     onClick={() => galleryInputRef.current?.click()}
-                    className="flex-1 bg-[#1E293B] border-slate-700"
+                    className="flex-1 bg-slate-100 border-slate-300"
                   >
-                    <ImageIcon className="w-5 h-5 mr-2 text-slate-300" />
-                    <span className="text-slate-300">Galeria / Print</span>
+                    <ImageIcon className="w-5 h-5 mr-2 text-slate-600" />
+                    <span className="text-slate-600">Galeria / Print</span>
                   </Button>
                 </div>
               </div>
@@ -301,7 +313,7 @@ export function ImportData() {
           )}
 
           {success && (
-            <div className="p-4 bg-sky-500/10 text-sky-400 rounded-xl flex items-start gap-3 border border-sky-500/20">
+            <div className="p-4 bg-sky-500/10 text-sky-600 rounded-xl flex items-start gap-3 border border-sky-500/20">
               <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" />
               <p className="text-sm font-medium">{success}</p>
             </div>
@@ -310,8 +322,8 @@ export function ImportData() {
 
         {/* Results Column */}
         {extractedData && (
-          <div className="bg-[#131B2F] p-6 rounded-3xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-[#1E293B] flex flex-col h-full">
-            <h3 className="font-semibold text-white text-lg mb-6 border-b border-[#1E293B] pb-4">
+          <div className="bg-white p-6 rounded-3xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-slate-200 flex flex-col h-full">
+            <h3 className="font-semibold text-slate-900 text-lg mb-6 border-b border-slate-200 pb-4">
               Comprovante Identificado
             </h3>
 
@@ -361,59 +373,52 @@ export function ImportData() {
               </form>
             ) : (
               <div className="space-y-6 flex-1">
-                <div className="bg-[#0B1121] p-5 rounded-2xl border border-slate-800/60 space-y-3">
-                  <div className="flex justify-between border-b border-slate-800/60 pb-3">
-                    <span className="text-slate-400 text-sm">
+                <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200/60 space-y-3">
+                  <div className="flex justify-between border-b border-slate-200/60 pb-3">
+                    <span className="text-slate-500 text-sm">
                       Estabelecimento:
                     </span>
-                    <span className="text-white font-medium text-right">
+                    <span className="text-slate-900 font-medium text-right">
                       {extractedData.description}
                     </span>
                   </div>
-                  <div className="flex justify-between border-b border-slate-800/60 pb-3 pt-1">
-                    <span className="text-slate-400 text-sm">Valor:</span>
+                  <div className="flex justify-between border-b border-slate-200/60 pb-3 pt-1">
+                    <span className="text-slate-500 text-sm">Valor:</span>
                     <span className="text-emerald-400 font-bold text-right">
                       R$ {extractedData.amount.toFixed(2)}
                     </span>
                   </div>
-                  <div className="flex justify-between border-b border-slate-800/60 pb-3 pt-1">
-                    <span className="text-slate-400 text-sm">Data:</span>
-                    <span className="text-white font-medium text-right">
+                  <div className="flex justify-between border-b border-slate-200/60 pb-3 pt-1">
+                    <span className="text-slate-500 text-sm">Data:</span>
+                    <span className="text-slate-900 font-medium text-right">
                       {extractedData.date}
                     </span>
                   </div>
                   <div className="flex justify-between pt-1">
-                    <span className="text-slate-400 text-sm">
+                    <span className="text-slate-500 text-sm">
                       Número da nota:
                     </span>
-                    <span className="text-white font-medium text-right">
+                    <span className="text-slate-900 font-medium text-right">
                       {extractedData.receiptNumber || "Não identificado"}
                     </span>
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <label className="block text-sm font-medium text-slate-300">
+                  <label className="block text-sm font-medium text-slate-600">
                     Escolha a conta para abater o valor:
                   </label>
                   <select
                     value={selectedAccountId}
                     onChange={(e) => setSelectedAccountId(e.target.value)}
-                    className="w-full h-11 px-4 rounded-xl border border-[#1E293B] focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-[#0B1121] text-white"
+                    className="w-full h-11 px-4 rounded-xl border border-slate-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 bg-slate-50 text-slate-900"
                   >
-                    <option value="" disabled>
-                      Selecione a conta
-                    </option>
-                    {accounts.map((a) => (
-                      <option key={a.id} value={a.id}>
-                        {a.name}
-                      </option>
-                    ))}
+                    <option value="default">Conta Padrão</option>
                   </select>
                 </div>
 
                 <div className="bg-sky-500/10 p-5 rounded-xl border border-sky-500/20 text-center mt-6">
-                  <p className="text-sky-400 font-medium mb-4">
+                  <p className="text-sky-600 font-medium mb-4">
                     Os dados identificados estão corretos?
                   </p>
 
@@ -438,7 +443,7 @@ export function ImportData() {
                     <Button
                       variant="ghost"
                       onClick={resetAll}
-                      className="w-full h-11 text-slate-400 hover:text-rose-400"
+                      className="w-full h-11 text-slate-500 hover:text-rose-400"
                       disabled={loading}
                     >
                       <RefreshCw className="w-4 h-4 mr-2" />
