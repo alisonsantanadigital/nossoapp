@@ -1,14 +1,102 @@
 @import "tailwindcss";
+@theme {
+  /* superfícies */
+  --color-surface-0: #EFEAE0;   /* fundo da página */
+  --color-surface-1: #F7F4EC;   /* cards, painéis */
+  --color-surface-2: #FFFFFF;   /* inputs, itens de lista */
+  --color-surface-hero: #211C17; /* fundo do card-herói (saldo, destaque) */
+  --color-surface-hero-2: #322B24;
+
+  /* texto */
+  --color-ink: #2B2721;         /* texto principal */
+  --color-ink-soft: #6E6659;    /* texto secundário */
+  --color-ink-muted: #9A9182;   /* texto terciário / placeholders */
+  --color-ink-hero: #F7F4EC;    /* texto sobre o card escuro */
+  --color-ink-hero-soft: #B7AE9F;
+
+  /* bordas */
+  --color-line: #E7E0D0;
+  --color-line-soft: #EDE6D6;
+
+  /* acento */
+  --color-accent: #C97A3D;      /* terracota — CTAs, ícones ativos */
+  --color-accent-strong: #A8622D;
+  --color-accent-soft: #F2E9DA; /* fundo de badges/ícones */
+
+  /* semânticas (recharts / status) */
+  --color-positive: #5E8A63;
+  --color-negative: #C0503F;
+
+  /* tipografia */
+  --font-display: "Fraunces", ui-serif, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 22px;
+  --radius-control: 12px;
+}
+
+.texture-grain {
+  position: relative;
+  isolation: isolate;
+}
+
+.texture-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.texture-linen {
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.035) 0px,
+    rgba(255, 255, 255, 0.035) 1px,
+    transparent 1px,
+    transparent 6px
+  );
+}
+
+.card-premium {
+  background: var(--color-surface-hero);
+  background-image: linear-gradient(160deg, var(--color-surface-hero-2) 0%, var(--color-surface-hero) 100%);
+  color: var(--color-ink-hero);
+  border-radius: var(--radius-card);
+  box-shadow: 0 18px 30px rgba(30, 24, 16, 0.28);
+}
+
+.badge-accent {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
+  color: #E7A467;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  padding: 5px 11px;
+  border-radius: 20px;
+}
+
+.number-display {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
 
 @layer base {
   body {
-    @apply bg-[#090E17] text-slate-100;
+    @apply bg-surface-0 text-ink;
   }
 }
 
 @theme {
   --animate-scan: scan 2s ease-in-out infinite;
-  
+
   @keyframes scan {
     0%, 100% { transform: translateY(0); opacity: 0; }
     10% { opacity: 1; }
