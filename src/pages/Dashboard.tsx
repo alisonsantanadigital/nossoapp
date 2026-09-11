@@ -152,12 +152,12 @@ export function Dashboard() {
   const displayName = userProfile?.displayName?.split(" ")[0] || "Usuário";
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+    <div className="space-y-4">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-4">
         <div className="flex items-center gap-4">
           <Link to="/settings" title="Editar Perfil" className="shrink-0 cursor-pointer hover:opacity-80 transition-opacity active:scale-95">
             {userProfile?.photoURL ? (
-              <img src={userProfile.photoURL} alt={displayName} className="w-12 h-12 md:w-16 md:h-16 rounded-full object-cover border-2 border-white/10" />
+              <img src={userProfile.photoURL} alt={displayName} className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover border-2 border-white/10" />
             ) : (
               <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/5 border-2 border-white/10 flex items-center justify-center">
                 <UserIcon className="w-6 h-6 text-slate-400" />
@@ -165,10 +165,10 @@ export function Dashboard() {
             )}
           </Link>
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+            <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight">
               Boa noite, {displayName} 👋
             </h1>
-            <p className="text-slate-400 mt-1">
+            <p className="text-slate-400 text-sm">
               Resumo da {organization?.name || "sua casa"} em{" "}
               
               {periodFilter === "current_month" ? (
@@ -185,7 +185,7 @@ export function Dashboard() {
       {/* Financial Overview Hero */}
       <div 
         onClick={() => navigate("/transactions")}
-        className="bg-indigo-500 rounded-3xl p-6 text-white shadow-lg shadow-indigo-500/20 relative overflow-hidden cursor-pointer hover:shadow-indigo-500/30 transition-shadow"
+        className="bg-indigo-500 rounded-2xl p-4 text-white shadow-lg shadow-indigo-500/20 relative overflow-hidden cursor-pointer hover:shadow-indigo-500/30 transition-shadow"
       >
         <div className="absolute right-0 top-0 w-64 h-64 bg-[#151E2E]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
         <div className="relative z-10">
@@ -193,7 +193,7 @@ export function Dashboard() {
             Total Atual
           </p>
           <div className="flex items-end gap-2 mb-6">
-            <span className="text-4xl md:text-5xl font-bold tracking-tight">
+            <span className="text-3xl md:text-4xl font-bold tracking-tight">
               {formatCurrency(metrics.actualBalance)}
             </span>
           </div>
@@ -268,9 +268,9 @@ export function Dashboard() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
         <Card className="flex flex-col">
-          <div className="p-6 border-b border-white/5 flex items-center justify-between">
+          <div className="p-4 border-b border-white/5 flex items-center justify-between">
             <h3 className="font-semibold text-white">Últimos Lançamentos</h3>
             <Link
               to="/transactions"
@@ -281,7 +281,7 @@ export function Dashboard() {
           </div>
           <CardContent className="p-0 flex-1">
             {transactions.length === 0 ? (
-              <div className="p-6 text-center text-slate-400 text-sm">
+              <div className="p-4 text-center text-slate-400 text-sm">
                 Nenhum lançamento recente.
               </div>
             ) : (
@@ -327,7 +327,7 @@ export function Dashboard() {
         </Card>
 
         <Card className="flex flex-col">
-          <div className="p-6 border-b border-white/5 flex items-center justify-between">
+          <div className="p-4 border-b border-white/5 flex items-center justify-between">
             <h3 className="font-semibold text-white">Progresso das Metas</h3>
             <Link
               to="/goals"
@@ -336,7 +336,7 @@ export function Dashboard() {
               Ver todas
             </Link>
           </div>
-          <CardContent className="p-6 space-y-6 flex-1">
+          <CardContent className="p-4 space-y-6 flex-1">
             {goals.length === 0 ? (
               <div className="text-center text-slate-400 text-sm h-full flex items-center justify-center">
                 Nenhuma meta definida.

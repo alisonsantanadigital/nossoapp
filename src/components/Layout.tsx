@@ -32,7 +32,7 @@ export function Layout() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#090E17] flex flex-col md:flex-row font-sans text-white">
+    <div className="h-screen bg-[#090E17] flex flex-col md:flex-row font-sans text-white overflow-hidden">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 flex-col border-r border-white/5 bg-[#151E2E] fixed h-full z-20">
         <div className="p-6">
@@ -88,9 +88,11 @@ export function Layout() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 md:ml-64 pb-32 md:pb-0">
-        <div className="max-w-5xl mx-auto p-4 md:p-8">
-          <Outlet />
+      <main className="flex-1 md:ml-64 flex flex-col h-full relative overflow-hidden">
+        <div className="flex-1 overflow-y-auto pb-24 md:pb-4 p-3 md:p-4">
+          <div className="max-w-5xl mx-auto w-full">
+            <Outlet />
+          </div>
         </div>
       </main>
 
@@ -129,7 +131,7 @@ export function Layout() {
 
       {/* Global FAB (Mobile) - Link to transactions as a generic add */}
       <div className="md:hidden fixed bottom-20 right-4 z-50">
-        <Link to="/transactions" className="w-14 h-14 bg-indigo-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-sky-500/30 active:scale-95 transition-transform">
+        <Link to="/transactions?new=true" className="w-14 h-14 bg-indigo-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-sky-500/30 active:scale-95 transition-transform">
           <Plus className="w-6 h-6" />
         </Link>
       </div>

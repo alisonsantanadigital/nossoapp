@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import {
   CreditCard,
   ArrowDownRight,
@@ -35,14 +35,24 @@ import type { Transaction } from "../types";
 
 export function Transactions() {
   const { organization } = useOrg();
+  const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const [filterType, setFilterType] = useState<"all" | "income" | "expense" | "pending">(location.state?.filter || "all");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTabKey, setActiveTabKey] = useState<string>("");
 
+  
+  useEffect(() => {
+    if (searchParams.get("new") === "true") {
+      handleOpenNew();
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams]);
+
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewingTx, setViewingTx] = useState<Transaction | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -303,12 +313,12 @@ export function Transactions() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
             Despesas e Receitas
           </h1>
-          <p className="text-slate-400 mt-1">
+          <p className="text-slate-400 text-sm">
             Acompanhe todas as movimentações da sua casa.
           </p>
         </div>
@@ -388,7 +398,8 @@ export function Transactions() {
                     <div
                       key={tx.id}
                       onDoubleClick={() => toggleTransactionStatus(tx)}
-                      className={`p-4 sm:px-6 flex items-center justify-between transition-colors group cursor-pointer select-none ${
+                      onClick={() => setViewingTx(tx)}
+                      className={`p-3 sm:px-4 flex items-center justify-between transition-colors group cursor-pointer select-none ${
                         tx.status === "completed"
                           ? tx.type === "expense"
                             ? "bg-rose-500/10 hover:bg-rose-500/15"
@@ -397,7 +408,7 @@ export function Transactions() {
                       }`}
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-3xl bg-white/5 flex items-center justify-center text-xl shadow-inner border border-white/5 overflow-hidden shrink-0 relative">
+                        <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center text-xl shadow-inner border border-white/5 overflow-hidden shrink-0 relative">
                           {tx.imageUrl ? (
                             <img
                               src={tx.imageUrl}
@@ -461,6 +472,84 @@ export function Transactions() {
           ))}
         </div>
       )}
+
+
+      <Modal
+        isOpen={!!viewingTx}
+        onClose={() => setViewingTx(null)}
+        title="Detalhes do Lançamento"
+      >
+        {viewingTx && (
+          <div className="space-y-6">
+            <div className="flex flex-col items-center justify-center py-6 bg-white/5 rounded-3xl border border-white/5">
+               <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center text-4xl mb-4 overflow-hidden border border-white/10">
+                  {viewingTx.imageUrl ? (
+                    <img src={viewingTx.imageUrl} alt={viewingTx.description} className="w-full h-full object-cover" />
+                  ) : (
+                    viewingTx.emoji || (viewingTx.type === "expense" ? "💸" : "💰")
+                  )}
+               </div>
+               <h2 className="text-xl font-bold text-white text-center px-4">{viewingTx.description}</h2>
+               <p className={`text-3xl font-bold mt-2 ${viewingTx.type === 'income' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                 {viewingTx.type === 'income' ? '+' : '-'} {formatCurrency(viewingTx.amount)}
+               </p>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex justify-between items-center py-3 border-b border-white/5">
+                <span className="text-slate-400">Status</span>
+                <span className={`font-medium px-3 py-1 rounded-full text-sm ${
+                  viewingTx.status === "completed"
+                    ? "bg-emerald-500/10 text-emerald-400"
+                    : "bg-amber-500/10 text-amber-500"
+                }`}>
+                  {viewingTx.status === "completed" ? "Pago/Recebido" : "Pendente"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-3 border-b border-white/5">
+                <span className="text-slate-400">Data</span>
+                <span className="text-white font-medium">{viewingTx.date.toLocaleDateString("pt-BR")}</span>
+              </div>
+              <div className="flex justify-between items-center py-3 border-b border-white/5">
+                <span className="text-slate-400">Tipo</span>
+                <span className="text-white font-medium capitalize">{viewingTx.type === 'income' ? 'Receita' : 'Despesa'}</span>
+              </div>
+              {viewingTx.isFixed && (
+                <div className="flex justify-between items-center py-3 border-b border-white/5">
+                  <span className="text-slate-400">Recorrência</span>
+                  <span className="text-amber-400 font-medium">Despesa Fixa</span>
+                </div>
+              )}
+              {viewingTx.installmentInfo && (
+                <div className="flex justify-between items-center py-3 border-b border-white/5">
+                  <span className="text-slate-400">Parcelamento</span>
+                  <span className="text-indigo-400 font-medium">{viewingTx.installmentInfo}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3 pt-4">
+               <Button 
+                 variant="outline" 
+                 className="flex-1"
+                 onClick={() => setViewingTx(null)}
+               >
+                 Fechar
+               </Button>
+               <Button 
+                 className="flex-1"
+                 onClick={() => {
+                   setViewingTx(null);
+                   openEditModal(viewingTx);
+                 }}
+               >
+                 <Edit2 className="w-4 h-4 mr-2" />
+                 Editar
+               </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
 
       <Modal
         isOpen={isModalOpen}
