@@ -2,6 +2,17 @@
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-800;
+    @apply bg-[#090E17] text-slate-100;
+  }
+}
+
+@theme {
+  --animate-scan: scan 2s ease-in-out infinite;
+  
+  @keyframes scan {
+    0%, 100% { transform: translateY(0); opacity: 0; }
+    10% { opacity: 1; }
+    50% { transform: translateY(350px); opacity: 1; }
+    90% { opacity: 1; }
   }
 }

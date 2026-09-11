@@ -1,4 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+const fs = require('fs');
+const path = './src/pages/Settings.tsx';
+
+const content = `import React, { useState, useEffect, useRef } from "react";
 import { updatePassword, signOut, createUserWithEmailAndPassword, getAuth } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import {
@@ -171,7 +174,7 @@ export function Settings() {
   };
 
   const usernameToEmail = (username: string) => {
-    return `${username.toLowerCase().trim()}@flowcontrol.app`;
+    return \`\${username.toLowerCase().trim()}@nossacasa.app\`;
   };
 
   const handleAddUser = async (e: React.FormEvent) => {
@@ -274,7 +277,7 @@ export function Settings() {
         });
         count++;
       }
-      setMigrationMsg(`Sucesso! ${count} registros foram importados.`);
+      setMigrationMsg(\`Sucesso! \${count} registros foram importados.\`);
     } catch (err) {
       console.error(err);
       setMigrationMsg("Erro ao importar os dados históricos.");
@@ -306,7 +309,7 @@ export function Settings() {
         totalDeleted += snapshot.size;
       }
       
-      setClearMsg(`Sucesso! ${totalDeleted} registros foram apagados definitivamente.`);
+      setClearMsg(\`Sucesso! \${totalDeleted} registros foram apagados definitivamente.\`);
     } catch (err) {
       console.error(err);
       setClearMsg("Erro ao tentar apagar os dados.");
@@ -371,7 +374,7 @@ export function Settings() {
           </div>
           {profileMsg.text && (
             <p
-              className={`text-sm ${profileMsg.type === "success" ? "text-indigo-400" : "text-rose-400"}`}
+              className={\`text-sm \${profileMsg.type === "success" ? "text-indigo-400" : "text-rose-400"}\`}
             >
               {profileMsg.text}
             </p>
@@ -461,7 +464,7 @@ export function Settings() {
           />
           {passwordMsg.text && (
             <p
-              className={`text-sm ${passwordMsg.type === "success" ? "text-indigo-400" : "text-rose-400"}`}
+              className={\`text-sm \${passwordMsg.type === "success" ? "text-indigo-400" : "text-rose-400"}\`}
             >
               {passwordMsg.text}
             </p>
@@ -575,3 +578,6 @@ export function Settings() {
     </div>
   );
 }
+`
+
+fs.writeFileSync(path, content);

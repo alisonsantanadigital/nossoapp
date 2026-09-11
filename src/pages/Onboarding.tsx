@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 
 export function Onboarding() {
   const { user, refreshProfile } = useAuth();
-  const [orgName, setOrgName] = useState("Nossa Casa");
+  const [orgName, setOrgName] = useState("FlowControl");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -54,15 +54,15 @@ export function Onboarding() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4">
-      <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200 text-center">
-        <div className="w-16 h-16 bg-sky-400/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-          <Building2 className="w-8 h-8 text-sky-600" />
+    <div className="min-h-screen bg-[#090E17] flex flex-col justify-center items-center p-4">
+      <div className="w-full max-w-md bg-[#151E2E] p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/5 text-center">
+        <div className="w-16 h-16 bg-indigo-400/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
+          <Building2 className="w-8 h-8 text-indigo-400" />
         </div>
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">
+        <h1 className="text-2xl font-bold text-white mb-2">
           👋 Vamos configurar sua casa
         </h1>
-        <p className="text-slate-500 mb-8 text-sm">
+        <p className="text-slate-400 mb-8 text-sm">
           Crie seu ambiente compartilhado para gerenciar as finanças.
         </p>
 
@@ -70,7 +70,7 @@ export function Onboarding() {
           <Input
             label="Qual o nome da sua organização/casa?"
             type="text"
-            placeholder="Ex: Família Silva, Nossa Casa..."
+            placeholder="Ex: Minhas Finanças, FlowControl..."
             value={orgName}
             onChange={(e) => setOrgName(e.target.value)}
             required

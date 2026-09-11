@@ -174,6 +174,23 @@ export function Transactions() {
     setIsModalOpen(true);
   };
 
+  
+  const toggleTransactionStatus = async (tx: Transaction) => {
+    if (!navigator.onLine) {
+      alert("Sem conexão com a internet.");
+      return;
+    }
+    try {
+      const newStatus = tx.status === "completed" ? "pending" : "completed";
+      await updateDoc(doc(db, "transactions", tx.id), {
+        status: newStatus
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao atualizar o status do lançamento.");
+    }
+  };
+
   const handleAddTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -219,7 +236,7 @@ export function Transactions() {
                 description,
                 date: installmentDate,
                 emoji,
-                status: "completed",
+                status: installmentDate <= new Date() ? "completed" : "pending",
                 accountId: "default",
                 isFixed: false,
                 installmentInfo: `${i + 1}/${installments}`,
@@ -237,7 +254,7 @@ export function Transactions() {
             description,
             date: baseDate,
             emoji,
-            status: "completed",
+            status: baseDate <= new Date() ? "completed" : "pending",
             accountId: "default",
             isFixed,
             imageUrl: imageBase64,
@@ -288,14 +305,14 @@ export function Transactions() {
     <div className="space-y-6">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
             Despesas e Receitas
           </h1>
-          <p className="text-slate-500 mt-1">
+          <p className="text-slate-400 mt-1">
             Acompanhe todas as movimentações da sua casa.
           </p>
         </div>
-        <Button onClick={handleOpenNew} className="shadow-lg shadow-sky-500/20">
+        <Button onClick={handleOpenNew} className="shadow-lg shadow-indigo-500/20">
           Novo Lançamento
         </Button>
       </header>
@@ -306,7 +323,7 @@ export function Transactions() {
           <button
             key={ft}
             onClick={() => setFilterType(ft)}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${filterType === ft ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-500 hover:text-slate-900"}`}
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${filterType === ft ? "bg-indigo-500 text-white shadow-md" : "bg-white/5 text-slate-400 hover:text-white"}`}
           >
             {ft === "all" ? "Todos" : ft === "income" ? "Entradas" : ft === "expense" ? "Saídas" : "Pendentes"}
           </button>
@@ -319,7 +336,7 @@ export function Transactions() {
             <button
               key={group.sortKey}
               onClick={() => setActiveTabKey(group.sortKey)}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${activeTabKey === group.sortKey ? "bg-sky-500 text-white" : "bg-slate-100 text-slate-500 hover:text-slate-900"}`}
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${activeTabKey === group.sortKey ? "bg-indigo-500 text-white" : "bg-white/5 text-slate-400 hover:text-white"}`}
             >
               {group.monthYear}
             </button>
@@ -339,35 +356,48 @@ export function Transactions() {
         <div className="space-y-8">
           {groupedTransactions.filter(g => g.sortKey === activeTabKey).map((group) => (
             <div key={group.sortKey} className="space-y-4">
-              <div className="flex justify-between items-end px-1 border-b border-slate-200/60 pb-2">
-                <h3 className="text-lg font-semibold text-slate-900">
+              <div className="flex justify-between items-end px-1 border-b border-white/5 pb-2">
+                <h3 className="text-lg font-semibold text-white">
                   Resumo do Mês
                 </h3>
-                <div className="flex gap-4 text-sm">
+                <div className="flex gap-3 sm:gap-4 text-sm">
                   <div className="flex flex-col items-end">
-                    <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Entradas</span>
-                    <span className="text-emerald-400 font-medium">
+                    <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Entradas</span>
+                    <span className="text-emerald-400 font-medium text-xs sm:text-sm">
                       +{formatCurrency(group.income)}
                     </span>
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Saídas</span>
-                    <span className="text-rose-400 font-medium">
+                    <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Saídas</span>
+                    <span className="text-rose-400 font-medium text-xs sm:text-sm">
                       -{formatCurrency(group.expense)}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-end border-l border-white/10 pl-3 sm:pl-4">
+                    <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Previsto</span>
+                    <span className={`font-medium text-xs sm:text-sm ${group.income - group.expense >= 0 ? 'text-indigo-400' : 'text-rose-400'}`}>
+                      {formatCurrency(group.income - group.expense)}
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-slate-200/60 overflow-hidden">
-                <div className="divide-y divide-slate-200">
+              <div className="bg-[#151E2E] rounded-3xl shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-white/5 overflow-hidden">
+                <div className="divide-y divide-white/5">
                   {group.items.map((tx) => (
                     <div
                       key={tx.id}
-                      className="p-4 sm:px-6 flex items-center justify-between hover:bg-slate-100 transition-colors group"
+                      onDoubleClick={() => toggleTransactionStatus(tx)}
+                      className={`p-4 sm:px-6 flex items-center justify-between transition-colors group cursor-pointer select-none ${
+                        tx.status === "completed"
+                          ? tx.type === "expense"
+                            ? "bg-rose-500/10 hover:bg-rose-500/15"
+                            : "bg-emerald-500/10 hover:bg-emerald-500/15"
+                          : "hover:bg-white/[0.04]"
+                      }`}
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-xl shadow-inner border border-slate-200/60 overflow-hidden shrink-0 relative">
+                        <div className="w-12 h-12 rounded-3xl bg-white/5 flex items-center justify-center text-xl shadow-inner border border-white/5 overflow-hidden shrink-0 relative">
                           {tx.imageUrl ? (
                             <img
                               src={tx.imageUrl}
@@ -380,7 +410,7 @@ export function Transactions() {
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <h4 className="font-semibold text-slate-900">
+                            <h4 className="font-semibold text-white">
                               {tx.description}
                             </h4>
                             {tx.isFixed && (
@@ -394,7 +424,7 @@ export function Transactions() {
                               </span>
                             )}
                           </div>
-                          <p className="text-sm text-slate-500">
+                          <p className="text-sm text-slate-400">
                             {tx.date.toLocaleDateString("pt-BR")}
                           </p>
                         </div>
@@ -402,7 +432,7 @@ export function Transactions() {
                       <div className="flex items-center gap-4">
                         <div className="text-right">
                           <span
-                            className={`font-bold ${tx.type === "income" ? "text-emerald-400" : "text-slate-900"}`}
+                            className={`font-bold ${tx.type === "income" ? "text-emerald-400" : "text-white"}`}
                           >
                             {tx.type === "income" ? "+" : "-"}{" "}
                             {formatCurrency(tx.amount)}
@@ -411,13 +441,13 @@ export function Transactions() {
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => openEditModal(tx)}
-                            className="p-2 text-slate-500 hover:text-sky-600 hover:bg-sky-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                            className="p-2 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDeleteTransaction(tx.id)}
-                            className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                            className="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -438,18 +468,18 @@ export function Transactions() {
         title={editingId ? "Editar Lançamento" : "Novo Lançamento"}
       >
         <form onSubmit={handleAddTransaction} className="space-y-4">
-          <div className="flex p-1 bg-slate-50 rounded-xl mb-4 border border-slate-200/60">
+          <div className="flex p-1 bg-[#090E17] rounded-3xl mb-4 border border-white/5">
             <button
               type="button"
               onClick={() => setType("expense")}
-              className={`flex-1 py-2 text-sm font-medium rounded-lg flex items-center justify-center transition-all ${type === "expense" ? "bg-slate-100 text-rose-400 shadow-sm" : "text-slate-500 hover:text-slate-900"}`}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg flex items-center justify-center transition-all ${type === "expense" ? "bg-white/5 text-rose-400 shadow-sm" : "text-slate-400 hover:text-white"}`}
             >
               <ArrowDownRight className="w-4 h-4 mr-1" /> Despesa
             </button>
             <button
               type="button"
               onClick={() => setType("income")}
-              className={`flex-1 py-2 text-sm font-medium rounded-lg flex items-center justify-center transition-all ${type === "income" ? "bg-slate-100 text-emerald-400 shadow-sm" : "text-slate-500 hover:text-slate-900"}`}
+              className={`flex-1 py-2 text-sm font-medium rounded-lg flex items-center justify-center transition-all ${type === "income" ? "bg-white/5 text-emerald-400 shadow-sm" : "text-slate-400 hover:text-white"}`}
             >
               <ArrowUpRight className="w-4 h-4 mr-1" /> Receita
             </button>
@@ -491,13 +521,13 @@ export function Transactions() {
 
           <div className="flex gap-4 relative">
             <div className="space-y-2 w-24 shrink-0">
-              <label className="text-sm font-medium leading-none text-slate-600">
+              <label className="text-sm font-medium leading-none text-slate-300">
                 Ícone
               </label>
               <button
                 type="button"
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className="flex h-11 w-full items-center justify-center rounded-xl border border-slate-300 bg-slate-50 px-3 py-2 text-2xl hover:bg-slate-100 transition-colors"
+                className="flex h-11 w-full items-center justify-center rounded-3xl border border-white/10 bg-[#090E17] px-3 py-2 text-2xl hover:bg-white/[0.04] transition-colors"
               >
                 {emoji}
               </button>
@@ -522,7 +552,7 @@ export function Transactions() {
             )}
 
             <div className="flex-1 space-y-2">
-              <label className="text-sm font-medium leading-none text-slate-600">
+              <label className="text-sm font-medium leading-none text-slate-300">
                 Foto / Comprovante
               </label>
               <div className="flex items-center gap-3">
@@ -546,7 +576,7 @@ export function Transactions() {
                   <button
                     type="button"
                     onClick={() => setImageBase64(null)}
-                    className="p-2 text-slate-500 hover:text-rose-400"
+                    className="p-2 text-slate-400 hover:text-rose-400"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -556,7 +586,7 @@ export function Transactions() {
           </div>
 
           {imageBase64 && (
-            <div className="mt-2 rounded-xl overflow-hidden border border-slate-300 h-32 w-full flex items-center justify-center bg-slate-50">
+            <div className="mt-2 rounded-3xl overflow-hidden border border-white/10 h-32 w-full flex items-center justify-center bg-[#090E17]">
               <img
                 src={imageBase64}
                 alt="Preview"
@@ -566,15 +596,15 @@ export function Transactions() {
           )}
 
           {!editingId && (
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200/60 space-y-4">
-              <h4 className="text-sm font-medium text-slate-600 mb-2">
+            <div className="p-4 bg-[#090E17] rounded-3xl border border-white/5 space-y-4">
+              <h4 className="text-sm font-medium text-slate-300 mb-2">
                 Recorrência e Parcelamento
               </h4>
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Repeat className="w-4 h-4 text-amber-500" />
-                  <span className="text-sm text-slate-600">
+                  <span className="text-sm text-slate-300">
                     É uma despesa fixa mensal?
                   </span>
                 </div>
@@ -588,13 +618,13 @@ export function Transactions() {
                     }}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                  <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[#151E2E] after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
                 </label>
               </div>
 
               {!isFixed && (
-                <div className="flex flex-col gap-2 pt-2 border-t border-slate-200">
-                  <label className="flex items-center gap-2 text-sm text-slate-600">
+                <div className="flex flex-col gap-2 pt-2 border-t border-white/5">
+                  <label className="flex items-center gap-2 text-sm text-slate-300">
                     <ListOrdered className="w-4 h-4 text-indigo-400" />
                     Quantidade de parcelas
                   </label>
@@ -608,7 +638,7 @@ export function Transactions() {
                     }
                   />
                   {installments > 1 && (
-                    <p className="text-xs text-slate-500 mt-1">
+                    <p className="text-xs text-slate-400 mt-1">
                       O valor total de R$ {amount || "0"} será dividido em{" "}
                       {installments} vezes de R${" "}
                       {(Number(amount) / installments).toFixed(2)}.

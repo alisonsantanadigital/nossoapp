@@ -1,5 +1,5 @@
 {
-  "name": "Nossa Casa",
+  "name": "FlowControl",
   "description": "Painel de controle financeiro familiar, projetado como um SaaS premium para gerenciar despesas, receitas, contas e metas da família.",
   "requestFramePermissions": [
     "camera"

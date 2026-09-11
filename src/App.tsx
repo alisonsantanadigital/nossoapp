@@ -18,6 +18,7 @@ import { Goals } from "./pages/Goals";
 import { Analytics } from "./pages/Analytics";
 import { Wishlist } from "./pages/Wishlist";
 import { ImportData } from "./pages/ImportData";
+import { CalendarView } from "./pages/CalendarView";
 import { Layout } from "./components/Layout";
 import { Settings } from "./pages/Settings";
 import { Loader2 } from "lucide-react";
@@ -87,6 +88,7 @@ export default function App() {
             >
               <Route path="/" element={<Dashboard />} />
               <Route path="/transactions" element={<Transactions />} />
+              <Route path="/calendar" element={<CalendarView />} />
               <Route path="/goals" element={<Goals />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/wishlist" element={<Wishlist />} />

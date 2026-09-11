@@ -1,214 +1,9 @@
-import React, { useState, useRef } from "react";
-import {
-  UploadCloud,
-  FileText,
-  CheckCircle2,
-  AlertCircle,
-  RefreshCw,
-  Plus,
-  Edit2,
-  Camera,
-  ScanLine,
-  Image as ImageIcon,
-} from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
-import { useOrg } from "../contexts/OrgContext";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "../lib/firebase";
-import { Button } from "../components/ui/Button";
-import { Input } from "../components/ui/Input";
+const fs = require('fs');
 
-interface ExtractedTransaction {
-  description: string;
-  amount: number;
-  type: "expense" | "income";
-  date: string;
-  receiptNumber?: string;
-}
+let path = './src/pages/ImportData.tsx';
+let content = fs.readFileSync(path, 'utf8');
 
-export function ImportData() {
-  const { userProfile } = useAuth();
-  const { organization } = useOrg();
-
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-
-  const [extractedData, setExtractedData] =
-    useState<ExtractedTransaction | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-
-  // Edit Form State
-  const [editDesc, setEditDesc] = useState("");
-  const [editAmount, setEditAmount] = useState("");
-  const [editDate, setEditDate] = useState("");
-  const [editReceiptNumber, setEditReceiptNumber] = useState("");
-
-  // Selected account and category to import
-  const [selectedAccountId, setSelectedAccountId] = useState("default");
-  const [selectedCategoryId, setSelectedCategoryId] = useState("");
-
-  const cameraInputRef = useRef<HTMLInputElement>(null);
-  const galleryInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!navigator.onLine) {
-      setError("Sem conexão com a internet. Verifique sua rede e tente novamente.");
-      return;
-    }
-
-    if (!file.type.startsWith("image/")) {
-      setError("Por favor, selecione apenas arquivos de imagem (PNG, JPG).");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        setImagePreview(event.target.result as string);
-        setError("");
-        setSuccess("");
-        setExtractedData(null);
-        setIsEditing(false);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleExtract = async () => {
-    if (!imagePreview) return;
-
-    if (!navigator.onLine) {
-      setError("Sem conexão com a internet. A leitura com IA precisa de internet.");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-
-    try {
-      const [header, base64Data] = imagePreview.split(",");
-      const mimeTypeMatch = header.match(/:(.*?);/);
-      const mimeType = mimeTypeMatch ? mimeTypeMatch[1] : "image/jpeg";
-
-      const res = await fetch("/api/gemini/extract-transactions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          imageBase64: base64Data,
-          mimeType,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Erro na API de IA");
-      }
-
-      setExtractedData(data.transaction);
-      setSuccess("Leitura concluída! Revise os dados abaixo.");
-    } catch (err: any) {
-      setError(err.message || "Falha ao analisar a imagem.");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleConfirmImport = async () => {
-    if (!extractedData) return;
-
-    if (!navigator.onLine) {
-      setError("Sem conexão com a internet. Verifique sua rede e tente novamente.");
-      return;
-    }
-
-    if (!userProfile?.currentOrganizationId) {
-      setError("Organização não encontrada.");
-      return;
-    }
-    if (!selectedAccountId) {
-      setError("Selecione uma conta para importar os lançamentos.");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-
-    try {
-      const orgId = userProfile.currentOrganizationId;
-      const txRef = collection(db, "transactions");
-
-      let dateObj = new Date(extractedData.date);
-      if (isNaN(dateObj.getTime())) dateObj = new Date();
-
-      await addDoc(txRef, {
-        orgId,
-        amount: extractedData.amount,
-        type: extractedData.type,
-        description: extractedData.description,
-        date: dateObj.toISOString(),
-        accountId: selectedAccountId,
-        categoryId: selectedCategoryId || null,
-        status: "completed",
-        createdAt: serverTimestamp(),
-        notes: extractedData.receiptNumber
-          ? `Nota: ${extractedData.receiptNumber}`
-          : "Importado via IA",
-        imageUrl: imagePreview,
-      });
-
-      setSuccess("Lançamento salvo com sucesso!");
-      setExtractedData(null);
-      setImagePreview(null);
-      setIsEditing(false);
-    } catch (err: any) {
-      setError("Erro ao salvar lançamento no banco de dados.");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const openEdit = () => {
-    if (!extractedData) return;
-    setEditDesc(extractedData.description);
-    setEditAmount(extractedData.amount.toString());
-    setEditDate(extractedData.date);
-    setEditReceiptNumber(extractedData.receiptNumber || "");
-    setIsEditing(true);
-  };
-
-  const saveEdit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!extractedData) return;
-
-    setExtractedData({
-      ...extractedData,
-      description: editDesc,
-      amount: Number(editAmount),
-      date: editDate,
-      receiptNumber: editReceiptNumber,
-    });
-    setIsEditing(false);
-  };
-
-  const resetAll = () => {
-    setImagePreview(null);
-    setExtractedData(null);
-    setIsEditing(false);
-    setError("");
-    setSuccess("");
-    if (cameraInputRef.current) cameraInputRef.current.value = "";
-    if (galleryInputRef.current) galleryInputRef.current.value = "";
-  };
-
-  return (
+const newReturn = `  return (
     <div className="max-w-2xl mx-auto space-y-8 pb-10">
       <div className="text-center space-y-2 mt-4">
         <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
@@ -224,8 +19,8 @@ export function ImportData() {
 
         <div className="relative z-10 space-y-6">
           <div
-            className={`relative rounded-[2rem] overflow-hidden flex flex-col items-center justify-center transition-all duration-500
-              ${imagePreview ? "bg-black/40 min-h-[300px]" : "bg-[#090E17] min-h-[350px] border-2 border-dashed border-white/10 hover:border-indigo-500/50 hover:bg-white/[0.02]"}`}
+            className={\`relative rounded-[2rem] overflow-hidden flex flex-col items-center justify-center transition-all duration-500
+              \${imagePreview ? "bg-black/40 min-h-[300px]" : "bg-[#090E17] min-h-[350px] border-2 border-dashed border-white/10 hover:border-indigo-500/50 hover:bg-white/[0.02]"}\`}
           >
             <input
               type="file"
@@ -248,7 +43,7 @@ export function ImportData() {
                 <img
                   src={imagePreview}
                   alt="Preview"
-                  className={`w-full max-h-[400px] object-contain transition-opacity duration-300 ${loading ? 'opacity-50' : 'opacity-100'}`}
+                  className={\`w-full max-h-[400px] object-contain transition-opacity duration-300 \${loading ? 'opacity-50' : 'opacity-100'}\`}
                 />
                 
                 {loading && (
@@ -399,7 +194,7 @@ export function ImportData() {
                 <div className="space-y-5">
                   <div className="flex justify-between items-center">
                     <span className="text-slate-400 text-sm">Valor</span>
-                    <span className={`text-2xl font-bold ${extractedData.type === 'income' ? 'text-emerald-400' : 'text-white'}`}>
+                    <span className={\`text-2xl font-bold \${extractedData.type === 'income' ? 'text-emerald-400' : 'text-white'}\`}>
                       R$ {extractedData.amount.toFixed(2).replace(".", ",")}
                     </span>
                   </div>
@@ -451,4 +246,11 @@ export function ImportData() {
       </div>
     </div>
   );
+}
+`;
+
+const returnIndex = content.indexOf('  return (');
+if (returnIndex !== -1) {
+  content = content.substring(0, returnIndex) + newReturn;
+  fs.writeFileSync(path, content);
 }

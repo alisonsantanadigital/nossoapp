@@ -148,23 +148,23 @@ export function Goals() {
   const getGoalIcon = (type: string) => {
     if (type === 'income') return <TrendingUp className="w-10 h-10 text-emerald-400" />;
     if (type === 'expense') return <TrendingDown className="w-10 h-10 text-rose-400" />;
-    return <PiggyBank className="w-10 h-10 text-sky-600" />;
+    return <PiggyBank className="w-10 h-10 text-indigo-400" />;
   };
 
   return (
     <div className="space-y-6">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
             Metas Concretas
           </h1>
-          <p className="text-slate-500 mt-1">
+          <p className="text-slate-400 mt-1">
             Defina limites de gastos ou metas de receita baseados em seus dados reais.
           </p>
         </div>
         <Button
           onClick={() => setIsModalOpen(true)}
-          className="shadow-lg shadow-sky-500/20"
+          className="shadow-lg shadow-indigo-500/20"
         >
           Nova Meta
         </Button>
@@ -187,54 +187,54 @@ export function Goals() {
             return (
               <Card
                 key={goal.id}
-                className="overflow-hidden hover:shadow-lg transition-shadow relative group bg-white border-slate-200/60"
+                className="overflow-hidden hover:shadow-lg transition-shadow relative group bg-[#151E2E] border-white/5"
               >
                 <button
                   onClick={(e) => handleDeleteGoal(goal.id, e)}
-                  className="absolute top-4 right-4 p-2 bg-slate-100 hover:bg-rose-500/20 text-slate-500 hover:text-rose-400 rounded-full opacity-0 group-hover:opacity-100 transition-all z-10"
+                  className="absolute top-4 right-4 p-2 bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 rounded-full opacity-0 group-hover:opacity-100 transition-all z-10"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
-                <div className="h-24 bg-slate-100 flex items-center justify-center border-b border-slate-200/60">
+                <div className="h-24 bg-white/5 flex items-center justify-center border-b border-white/5">
                   {getGoalIcon(goalType)}
                 </div>
                 <CardContent className="p-6">
                   <div className="mb-4">
-                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-md bg-slate-200 text-slate-700">
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-md bg-white/10 text-slate-200">
                       {goalType === 'income' ? 'Meta de Receita' : goalType === 'expense' ? 'Limite de Gastos' : 'Economia'}
                     </span>
                   </div>
-                  <h3 className="font-semibold text-lg text-slate-900 mb-4">
+                  <h3 className="font-semibold text-lg text-white mb-4">
                     {goal.name}
                   </h3>
 
                   <div className="flex justify-between items-end mb-2">
                     <div>
-                      <p className="text-xs text-slate-500 font-medium">
+                      <p className="text-xs text-slate-400 font-medium">
                         {goalType === 'expense' ? 'Já Gasto' : 'Alcançado'}
                       </p>
-                      <p className={`text-lg font-bold ${isDanger ? 'text-rose-400' : 'text-slate-900'}`}>
+                      <p className={`text-lg font-bold ${isDanger ? 'text-rose-400' : 'text-white'}`}>
                         {formatCurrency(current)}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-slate-500 font-medium">
+                      <p className="text-xs text-slate-400 font-medium">
                         {goalType === 'expense' ? 'Limite' : 'Objetivo'}
                       </p>
-                      <p className="text-sm font-medium text-slate-600">
+                      <p className="text-sm font-medium text-slate-300">
                         {formatCurrency(goal.targetAmount)}
                       </p>
                     </div>
                   </div>
 
-                  <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden border border-slate-200/60">
+                  <div className="w-full bg-white/5 rounded-full h-2.5 overflow-hidden border border-white/5">
                     <div
                       className={`h-2.5 rounded-full ${
                         isDanger 
                           ? 'bg-rose-500' 
                           : goalType === 'income' 
                             ? 'bg-emerald-500' 
-                            : 'bg-sky-500'
+                            : 'bg-indigo-500'
                       }`}
                       style={{ width: `${percentage}%` }}
                     ></div>
@@ -253,15 +253,15 @@ export function Goals() {
       >
         <form onSubmit={handleAddGoal} className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-600">Tipo de Meta</label>
+            <label className="text-sm font-medium text-slate-300">Tipo de Meta</label>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setType('income')}
-                className={`p-3 rounded-xl border text-sm font-medium transition-all ${
+                className={`p-3 rounded-3xl border text-sm font-medium transition-all ${
                   type === 'income' 
                     ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400' 
-                    : 'bg-slate-100 border-slate-300 text-slate-500 hover:text-slate-900'
+                    : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
                 }`}
               >
                 Meta de Renda
@@ -269,10 +269,10 @@ export function Goals() {
               <button
                 type="button"
                 onClick={() => setType('expense')}
-                className={`p-3 rounded-xl border text-sm font-medium transition-all ${
+                className={`p-3 rounded-3xl border text-sm font-medium transition-all ${
                   type === 'expense' 
                     ? 'bg-rose-500/20 border-rose-500 text-rose-400' 
-                    : 'bg-slate-100 border-slate-300 text-slate-500 hover:text-slate-900'
+                    : 'bg-white/5 border-white/10 text-slate-400 hover:text-white'
                 }`}
               >
                 Limite de Gastos

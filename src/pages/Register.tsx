@@ -63,17 +63,17 @@ export function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4">
-      <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200">
+    <div className="min-h-screen bg-[#090E17] flex flex-col justify-center items-center p-4">
+      <div className="w-full max-w-md bg-[#151E2E] p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/5">
         <div className="flex justify-center mb-6">
-          <div className="w-12 h-12 rounded-xl bg-sky-500 flex items-center justify-center shadow-lg shadow-sky-500/20">
-            <Home className="w-7 h-7 text-slate-900" />
+          <div className="w-12 h-12 rounded-3xl bg-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <Home className="w-7 h-7 text-white" />
           </div>
         </div>
-        <h1 className="text-2xl font-bold text-center text-slate-900 mb-2">
+        <h1 className="text-2xl font-bold text-center text-white mb-2">
           Criar Conta
         </h1>
-        <p className="text-center text-slate-500 mb-8 text-sm">
+        <p className="text-center text-slate-400 mb-8 text-sm">
           Comece a organizar as finanças da sua casa.
         </p>
 
@@ -120,11 +120,11 @@ export function Register() {
           </Button>
         </form>
 
-        <p className="text-center text-slate-500 text-sm mt-8">
+        <p className="text-center text-slate-400 text-sm mt-8">
           Já possui conta?{" "}
           <Link
             to="/login"
-            className="font-medium text-sky-600 hover:text-sky-700"
+            className="font-medium text-indigo-400 hover:text-sky-700"
           >
             Entrar
           </Link>

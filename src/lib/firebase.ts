@@ -58,3 +58,5 @@ export function handleFirestoreError(
   console.error("Firestore Error: ", JSON.stringify(errInfo));
   throw new Error(JSON.stringify(errInfo));
 }
+
+export { firebaseConfig };

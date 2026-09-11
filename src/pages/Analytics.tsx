@@ -151,10 +151,10 @@ export function Analytics() {
     <div className="space-y-6">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
             Análise Financeira
           </h1>
-          <p className="text-slate-500 mt-1">
+          <p className="text-slate-400 mt-1">
             Visão detalhada e histórica do seu comportamento financeiro.
           </p>
         </div>
@@ -170,10 +170,10 @@ export function Analytics() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
           {/* Evolução Mensal */}
-          <Card className="col-span-1 lg:col-span-2 bg-white border-slate-200/60">
+          <Card className="col-span-1 lg:col-span-2 bg-[#151E2E] border-white/5">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-sky-600" />
+                <BarChart3 className="w-5 h-5 text-indigo-400" />
                 Evolução Mensal (Entradas vs Saídas)
               </CardTitle>
             </CardHeader>
@@ -197,7 +197,7 @@ export function Analytics() {
           </Card>
 
           {/* Fluxo de Caixa (Acumulado) */}
-          <Card className="bg-white border-slate-200/60">
+          <Card className="bg-[#151E2E] border-white/5">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-emerald-400" />
@@ -226,7 +226,7 @@ export function Analytics() {
           </Card>
 
           {/* Onde vai o dinheiro */}
-          <Card className="bg-white border-slate-200/60">
+          <Card className="bg-[#151E2E] border-white/5">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <PieChartIcon className="w-5 h-5 text-rose-400" />
@@ -261,7 +261,7 @@ export function Analytics() {
           </Card>
 
           {/* Top 5 Gastos em Barras */}
-          <Card className="bg-white border-slate-200/60">
+          <Card className="bg-[#151E2E] border-white/5">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Activity className="w-5 h-5 text-amber-400" />
@@ -285,7 +285,7 @@ export function Analytics() {
           </Card>
 
           {/* Proporção Geral */}
-          <Card className="bg-white border-slate-200/60">
+          <Card className="bg-[#151E2E] border-white/5">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Target className="w-5 h-5 text-indigo-400" />
